@@ -1,4 +1,5 @@
 import re
+import subprocess
 import unicodedata
 from string import punctuation
 
@@ -116,3 +117,27 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
         return lemmas
     else:
         return " ".join(lemmas)
+
+
+def asum(inputDir, outputDir, alpha, beta, gamma, nTopics):
+    subprocess.call(
+        [
+            "java",
+            "-jar",
+            "./lib/ASUM.jar",
+            "-a",
+            alpha,
+            "-b",
+            beta,
+            "-g",
+            gamma,
+            "-t",
+            nTopics,
+            "-th",
+            "3",
+            "-d",
+            inputDir,
+            "-o",
+            outputDir,
+        ]
+    )
