@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.tag import pos_tag
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
 
 nltk.download("stopwords", quiet=True)
 nltk.download("punkt", quiet=True)
@@ -21,7 +21,7 @@ STOPWORDS.remove("not")
 STOPWORDS.remove("nor")
 STOPWORDS.remove("against")
 
-PUNCTUATIONS = set(punctuation + "…")
+PUNCTUATIONS = set(punctuation)
 
 URL_RE = r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"
 
@@ -47,10 +47,14 @@ def remove_non_ascii(text):
     )
 
 
+def remove_special_chars(text):
+    text = text.replace("/", " ")  # split slashes
+    return re.sub(r"[^a-zA-z\s]", "", text)
+
+
 def normalize(words, lowercase=False):
     tokens = []
     for word in words:
-        word = remove_non_ascii(word)
         if lowercase:
             word = word.lower()
         if word.lower() not in PUNCTUATIONS and word.lower() not in STOPWORDS:
@@ -79,12 +83,36 @@ def lemmatize(words):
     return lemmas
 
 
-def preprocess(text):
+def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
+    # text cleaning
     text = strip_html(text)
     text = remove_urls(text)
     text = remove_spaces(text)
+    text = remove_non_ascii(text)
+    text = remove_special_chars(text)
+
+    # expand contractions
     text = contractions.fix(text)
-    tokens = word_tokenize(text)
-    tokens = normalize(tokens, lowercase=True)
-    lemmas = lemmatize(tokens)
-    return " ".join(lemmas)
+
+    if sentences:
+        sent_tokens = []
+        for sent in sent_tokenize(text):
+            tokens = word_tokenize(sent)
+            tokens = normalize(tokens, lowercase=lowercase)
+            lemmas = lemmatize(tokens)
+
+            if len(lemmas) > 0:
+                sent_tokens.append(lemmas)
+        if return_tokens:
+            return sent_tokens
+        else:
+            return [" ".join(sent) for sent in sent_tokens]
+    else:
+        tokens = word_tokenize(text)
+        tokens = normalize(tokens, lowercase=lowercase)
+        lemmas = lemmatize(tokens)
+
+    if return_tokens:
+        return lemmas
+    else:
+        return " ".join(lemmas)
