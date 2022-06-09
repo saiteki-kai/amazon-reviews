@@ -60,6 +60,7 @@ nbclient==0.6.4
 nbconvert==6.5.0
 nbformat==5.4.0
 nest-asyncio==1.5.5
+networkx==2.8.3
 nltk==3.7
 notebook==6.4.11
 numexpr==2.8.1
@@ -70,7 +71,9 @@ pandocfilters==1.5.0
 parso==0.8.3
 partd==1.2.0
 pathspec==0.9.0
+patsy==0.5.2
 pexpect==4.8.0
+pgmpy==0.1.18
 pickleshare==0.7.5
 Pillow==9.1.1
 platformdirs==2.5.2
@@ -100,6 +103,7 @@ six==1.16.0
 sklearn==0.0
 soupsieve==2.3.2.post1
 stack-data==0.2.0
+statsmodels==0.13.2
 tables==3.7.0
 tenacity==8.0.1
 terminado==0.15.0
@@ -108,9 +112,11 @@ threadpoolctl==3.1.0
 tinycss2==1.1.1
 tomli==2.0.1
 toolz==0.11.2
+torch==1.11.0
 tornado==6.1
 tqdm==4.64.0
 traitlets==5.2.2.post1
+typing_extensions==4.2.0
 wcwidth==0.2.5
 webencodings==0.5.1
 Werkzeug==2.1.2
