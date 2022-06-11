@@ -132,4 +132,7 @@ dmypy.json
 .vscode/
 
 # project 
-data/
+data/raw
+data/processed
+data/asum/*
+!data/asum/SentiWords-*
