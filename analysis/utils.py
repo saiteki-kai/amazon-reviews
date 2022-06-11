@@ -127,7 +127,7 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
         return " ".join(lemmas)
 
 
-def asum(inputDir, outputDir, alpha, beta, gamma, nTopics):
+def asum(inputDir, outputDir, alpha, beta, gamma, nTopics, iterations="1000"):
     subprocess.call(
         [
             "java",
@@ -143,6 +143,8 @@ def asum(inputDir, outputDir, alpha, beta, gamma, nTopics):
             nTopics,
             "-th",
             "3",
+            "-i",
+            iterations,
             "-d",
             inputDir,
             "-o",
