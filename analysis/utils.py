@@ -1,6 +1,7 @@
 import re
 import subprocess
 import unicodedata
+from autocorrect import Speller
 from string import punctuation
 
 import contractions
@@ -25,6 +26,9 @@ STOPWORDS.remove("against")
 PUNCTUATIONS = set(punctuation)
 
 URL_RE = r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"
+
+
+spell = Speller()
 
 
 def remove_urls(text):
@@ -90,7 +94,9 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
     text = remove_urls(text)
     text = remove_spaces(text)
     text = remove_non_ascii(text)
-    text = remove_special_chars(text)
+
+    # correct spelling
+    text = spell(text)
 
     # expand contractions
     text = contractions.fix(text)
