@@ -132,7 +132,7 @@ def asum(inputDir, outputDir, alpha, beta, gamma, nTopics, iterations="1000"):
         [
             "java",
             "-jar",
-            "./lib/ASUM.jar",
+            "../bin/ASUM.jar",
             "-a",
             alpha,
             "-b",
