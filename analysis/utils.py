@@ -98,6 +98,7 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
     if sentences:
         sent_tokens = []
         for sent in sent_tokenize(text):
+            sent = remove_special_chars(sent)
             tokens = word_tokenize(sent)
             tokens = normalize(tokens, lowercase=lowercase)
             lemmas = lemmatize(tokens)
@@ -109,6 +110,7 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
         else:
             return [" ".join(sent) for sent in sent_tokens]
     else:
+        text = remove_special_chars(text)
         tokens = word_tokenize(text)
         tokens = normalize(tokens, lowercase=lowercase)
         lemmas = lemmatize(tokens)
