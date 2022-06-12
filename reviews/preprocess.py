@@ -1,16 +1,15 @@
 import re
-import subprocess
 import unicodedata
-from autocorrect import Speller
 from string import punctuation
 
 import contractions
 import nltk
+from autocorrect import Speller
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.tag import pos_tag
-from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 nltk.download("stopwords", quiet=True)
 nltk.download("punkt", quiet=True)
@@ -28,7 +27,7 @@ PUNCTUATIONS = set(punctuation)
 URL_RE = r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"
 
 
-spell = Speller()
+# spell = Speller()
 
 
 def remove_urls(text):
@@ -60,6 +59,7 @@ def remove_special_chars(text):
 def normalize(words, lowercase=False):
     tokens = []
     for word in words:
+        # word = spell(word) # correct spelling
         if lowercase:
             word = word.lower()
         if word.lower() not in PUNCTUATIONS and word.lower() not in STOPWORDS:
@@ -90,13 +90,13 @@ def lemmatize(words):
 
 def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
     # text cleaning
-    text = strip_html(text)
     text = remove_urls(text)
+    text = strip_html(text)
     text = remove_spaces(text)
     text = remove_non_ascii(text)
 
     # correct spelling
-    text = spell(text)
+    # text = spell(text)
 
     # expand contractions
     text = contractions.fix(text)
@@ -125,29 +125,3 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
         return lemmas
     else:
         return " ".join(lemmas)
-
-
-def asum(inputDir, outputDir, alpha, beta, gamma, nTopics, iterations="1000"):
-    subprocess.call(
-        [
-            "java",
-            "-jar",
-            "../bin/ASUM.jar",
-            "-a",
-            alpha,
-            "-b",
-            beta,
-            "-g",
-            gamma,
-            "-t",
-            nTopics,
-            "-th",
-            "3",
-            "-i",
-            iterations,
-            "-d",
-            inputDir,
-            "-o",
-            outputDir,
-        ]
-    )

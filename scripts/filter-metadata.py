@@ -2,18 +2,23 @@ import pandas as pd
 import gzip
 import json
 
+import sys;
+sys.path.append('.')
+
+from reviews.config import raw_data_dir, processed_data_dir
+
 fields_to_remove = set(
     [
         "tech1",
         "tech2",
-        "brand",
+        # "brand",
         "feature",
         "rank",
         "fit",
         "also_buy",
         "also_view",
         "similar_item",
-        "price",
+        # "price",
         "imageURL",
         "imageURLHighRes",
         "details",
@@ -22,12 +27,17 @@ fields_to_remove = set(
 
 # load data
 data = []
-with gzip.open("./data/meta_Electronics.json.gz") as f:
+with gzip.open(raw_data_dir / "meta_Electronics.json.gz") as f:
     for l in f:
         prod = json.loads(l.strip())
 
         # filter category
-        if any(["computers" in sub_cat.lower() for sub_cat in prod["category"]]):
+        sub_categories = list(prod["category"])
+        if (
+            len(sub_categories) > 2
+            and sub_categories[1] == "Camera & Photo"
+            and sub_categories[2] == "Digital Cameras"
+        ):
             # remove unwanted fields
             [prod.pop(field, None) for field in fields_to_remove]
             data.append(prod)
@@ -46,4 +56,8 @@ df = df.drop_duplicates(subset=["asin"])
 print(len(df))
 
 # save the data frame
-df.to_json("./data/meta_computers.json.gz", orient="records", compression="gzip")
+df.to_json(
+    processed_data_dir / "meta_digital_cameras.json.gz",
+    orient="records",
+    compression="gzip",
+)

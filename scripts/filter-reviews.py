@@ -2,18 +2,20 @@ import pandas as pd
 import gzip
 import json
 
+import sys;
+sys.path.append('.')
+
+from reviews.config import raw_data_dir, processed_data_dir
+
 # get asin codes
-prod_df =  pd.read_json("./data/meta_computers.json.gz")
+prod_df =  pd.read_json(processed_data_dir / "meta_digital_cameras.json.gz")
 asin = set(prod_df["asin"])
 print("Products Metadata Loaded")
-
-# try with more RAM
-# df = pd.read_json("./data/Electronics_5.json.gz", orient="records")
 
 i = 0
 k = 0
 data = []
-with gzip.open("./data/Electronics_5.json.gz") as f:
+with gzip.open(raw_data_dir / "Electronics_5.json.gz") as f:
   for l in f:
     review = json.loads(l.strip())
     
@@ -27,10 +29,7 @@ with gzip.open("./data/Electronics_5.json.gz") as f:
         data.append(review)
         i = i + 1
 
-    # limit number of data
-    if i > 100000:
-      break
-
+    # progress
     if k % 50000 == 0:
       print(f"{i} / {k}")
     k = k + 1
@@ -56,4 +55,4 @@ df["timestamp"] = pd.to_datetime(df["timestamp"])
 
 df.info(verbose=True, memory_usage="deep")
 
-df.to_json("./data/reviews_computers.json.gz", orient="records", compression="gzip")
+df.to_json(processed_data_dir / "reviews_digital_cameras.json.gz", orient="records", compression="gzip")
