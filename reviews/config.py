@@ -1,13 +1,16 @@
+import os
 from pathlib import Path
 
-bin_dir = Path('../bin')
-data_dir = Path('../data')
-out_dir = Path('../output')
+root_dir = Path(os.path.dirname(os.path.realpath(__file__))).parent
 
-raw_data_dir = data_dir / 'raw'
-processed_data_dir = data_dir / 'processed'
+bin_dir = root_dir / "bin"
+data_dir = root_dir / "data"
+out_dir = root_dir / "output"
 
-asum_model_path = bin_dir / 'ASUM.jar'
+raw_data_dir = data_dir / "raw"
+processed_data_dir = data_dir / "processed"
 
-asum_input_dir =  data_dir / "asum"
+asum_model_path = bin_dir / "ASUM.jar"
+
+asum_input_dir = data_dir / "asum"
 asum_output_dir = out_dir / "asum"
