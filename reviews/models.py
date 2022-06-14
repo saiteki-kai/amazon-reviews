@@ -1,9 +1,9 @@
 import subprocess
 
-from reviews.config import asum_model_path
+from reviews.config import asum_input_dir, asum_model_path, asum_output_dir
 
 
-def asum(inputDir, outputDir, alpha, beta, gamma, nTopics, iterations="1000"):
+def asum(alpha, beta, gamma, n_topics, iterations="1000"):
     subprocess.call(
         [
             "java",
@@ -16,14 +16,14 @@ def asum(inputDir, outputDir, alpha, beta, gamma, nTopics, iterations="1000"):
             "-g",
             gamma,
             "-t",
-            nTopics,
+            n_topics,
             "-th",
             "3",
             "-i",
             iterations,
             "-d",
-            inputDir,
+            asum_input_dir,
             "-o",
-            outputDir,
+            asum_output_dir,
         ]
     )
