@@ -1,0 +1,53 @@
+\documentclass[titlepage]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[OT1]{fontenc}
+\usepackage{cmbright}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage{amsthm}
+\usepackage{biblatex}
+\usepackage{mdframed}
+
+% info --------------------------------
+
+\title{Data Analytics}
+\date{2021 - 2022}
+
+% fancyhdr ----------------------------
+
+\pagestyle{fancy}
+\setlength{\headheight}{13pt}
+\cfoot{\thepage}
+\lhead{}
+\rhead{\leftmark}
+
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% document ----------------------------
+
+\addbibresource{ref.bib}
+
+\begin{document}
+
+\include{frontpage}
+
+\pagenumbering{roman}
+
+\tableofcontents
+
+\clearpage
+\pagenumbering{arabic}
+
+
+\include{chapters/01_introduction}
+\include{chapters/02_dataset}
+\include{chapters/03_processing}
+
+\printbibliography
+
+\end{document}
