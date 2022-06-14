@@ -33,22 +33,22 @@ SPACES_RE = re.compile(" +")
 ALPHA_RE = re.compile(r"[^a-zA-z\s]")
 
 
-# init spell checker
-speller = SymSpell()
-
-resource_name = "frequency_dictionary_en_82_765.txt"
-with importlib.resources.path("symspellpy", resource_name) as dictionary_path:
-    speller.load_dictionary(dictionary_path, term_index=0, count_index=1)
-
-# init lemmatizer
-wnl = WordNetLemmatizer()
-
-wordnet_tags = {
+WORDNET_TAGS = {
     "N": wordnet.NOUN,
     "J": wordnet.ADJ,
     "V": wordnet.VERB,
     "R": wordnet.ADV,
 }
+
+# init spell checker
+speller = SymSpell()
+
+RESOURCE_NAME = "frequency_dictionary_en_82_765.txt"
+with importlib.resources.path("symspellpy", RESOURCE_NAME) as dictionary_path:
+    speller.load_dictionary(dictionary_path, term_index=0, count_index=1)
+
+# init lemmatizer
+wnl = WordNetLemmatizer()
 
 
 def remove_urls(text):
@@ -93,7 +93,7 @@ def normalize(words, lowercase=False):
 
 def get_wordnet_pos(treebank_tag):
     start = treebank_tag[0]
-    return wordnet_tags.get(start, wordnet.NOUN)
+    return WORDNET_TAGS.get(start, wordnet.NOUN)
 
 
 def lemmatize_sentences(sentences):
@@ -137,15 +137,15 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
 
         if return_tokens:
             return sent_lemmas
-        else:
-            return [" ".join(sent) for sent in sent_lemmas]
-    else:
-        text = remove_special_chars(text)
-        tokens = word_tokenize(text)
-        tokens = normalize(tokens, lowercase=lowercase)
-        lemmas = lemmatize(tokens)
+
+        return [" ".join(sent) for sent in sent_lemmas]
+
+    text = remove_special_chars(text)
+    tokens = word_tokenize(text)
+    tokens = normalize(tokens, lowercase=lowercase)
+    lemmas = lemmatize(tokens)
 
     if return_tokens:
         return lemmas
-    else:
-        return " ".join(lemmas)
+
+    return " ".join(lemmas)
