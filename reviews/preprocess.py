@@ -1,6 +1,5 @@
 import importlib.resources
 import re
-import string
 import unicodedata
 
 import contractions
@@ -23,9 +22,16 @@ STOPWORDS.remove("not")
 STOPWORDS.remove("nor")
 STOPWORDS.remove("against")
 
-PUNCTUATIONS = set(string.punctuation)
+# Regular expressions
 
-URL_RE = r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"  # noqa: E501
+URL_RE = re.compile(
+    r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"  # noqa: E501
+)
+
+SPACES_RE = re.compile(" +")
+
+ALPHA_RE = re.compile(r"[^a-zA-z\s]")
+
 
 # init spell checker
 speller = SymSpell()
@@ -37,13 +43,20 @@ with importlib.resources.path("symspellpy", resource_name) as dictionary_path:
 # init lemmatizer
 wnl = WordNetLemmatizer()
 
+wordnet_tags = {
+    "N": wordnet.NOUN,
+    "J": wordnet.ADJ,
+    "V": wordnet.VERB,
+    "R": wordnet.ADV,
+}
+
 
 def remove_urls(text):
-    return re.sub(URL_RE, "", text)
+    return URL_RE.sub("", text)
 
 
 def remove_spaces(text):
-    return re.sub(" +", " ", text)
+    return SPACES_RE.sub(" ", text)
 
 
 def strip_html(text):
@@ -61,7 +74,7 @@ def remove_non_ascii(text):
 
 def remove_special_chars(text):
     text = text.replace("/", " ")  # split slashes
-    return re.sub(r"[^a-zA-z\s]", "", text)
+    return ALPHA_RE.sub("", text)
 
 
 def normalize(words, lowercase=False):
@@ -69,7 +82,7 @@ def normalize(words, lowercase=False):
     for word in words:
         if lowercase:
             word = word.lower()
-        if word.lower() not in PUNCTUATIONS and word.lower() not in STOPWORDS:
+        if word.lower() not in STOPWORDS:
             suggestions = speller.lookup(word, Verbosity.CLOSEST)
             if len(suggestions) > 0:
                 tokens.append(suggestions[0].term)
@@ -80,17 +93,7 @@ def normalize(words, lowercase=False):
 
 def get_wordnet_pos(treebank_tag):
     start = treebank_tag[0]
-
-    if start == "N":
-        return wordnet.NOUN
-    elif start == "J":
-        return wordnet.ADJ
-    elif start == "V":
-        return wordnet.VERB
-    elif start == "R":
-        return wordnet.ADV
-
-    return wordnet.NOUN
+    return wordnet_tags.get(start, wordnet.NOUN)
 
 
 def lemmatize_sentences(sentences):
@@ -116,6 +119,7 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
     text = strip_html(text)
     text = remove_spaces(text)
     text = remove_non_ascii(text)
+
     # expand contractions
     text = contractions.fix(text)
 
