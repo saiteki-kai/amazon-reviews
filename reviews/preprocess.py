@@ -1,15 +1,16 @@
+import importlib.resources
 import re
+import string
 import unicodedata
-from string import punctuation
 
 import contractions
 import nltk
-from autocorrect import Speller
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
-from nltk.tag import pos_tag
+from nltk.tag import pos_tag, pos_tag_sents
 from nltk.tokenize import sent_tokenize, word_tokenize
+from symspellpy import SymSpell, Verbosity
 
 nltk.download("stopwords", quiet=True)
 nltk.download("punkt", quiet=True)
@@ -22,12 +23,19 @@ STOPWORDS.remove("not")
 STOPWORDS.remove("nor")
 STOPWORDS.remove("against")
 
-PUNCTUATIONS = set(punctuation)
+PUNCTUATIONS = set(string.punctuation)
 
-URL_RE = r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"
+URL_RE = r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"  # noqa: E501
 
+# init spell checker
+speller = SymSpell()
 
-# spell = Speller()
+resource_name = "frequency_dictionary_en_82_765.txt"
+with importlib.resources.path("symspellpy", resource_name) as dictionary_path:
+    speller.load_dictionary(dictionary_path, term_index=0, count_index=1)
+
+# init lemmatizer
+wnl = WordNetLemmatizer()
 
 
 def remove_urls(text):
@@ -59,29 +67,43 @@ def remove_special_chars(text):
 def normalize(words, lowercase=False):
     tokens = []
     for word in words:
-        # word = spell(word) # correct spelling
         if lowercase:
             word = word.lower()
         if word.lower() not in PUNCTUATIONS and word.lower() not in STOPWORDS:
-            tokens.append(word)
+            suggestions = speller.lookup(word, Verbosity.CLOSEST)
+            if len(suggestions) > 0:
+                tokens.append(suggestions[0].term)
+            else:
+                tokens.append(word)
     return tokens
 
 
 def get_wordnet_pos(treebank_tag):
-    if treebank_tag.startswith("J"):
+    start = treebank_tag[0]
+
+    if start == "N":
+        return wordnet.NOUN
+    elif start == "J":
         return wordnet.ADJ
-    elif treebank_tag.startswith("V"):
+    elif start == "V":
         return wordnet.VERB
-    elif treebank_tag.startswith("N"):
-        return wordnet.NOUN
-    elif treebank_tag.startswith("R"):
+    elif start == "R":
         return wordnet.ADV
-    else:
-        return wordnet.NOUN
+
+    return wordnet.NOUN
+
+
+def lemmatize_sentences(sentences):
+    sent_lemmas = []
+    for pos_sent in pos_tag_sents(sentences):
+        lemmas = []
+        for word, pos in pos_sent:
+            lemmas.append(wnl.lemmatize(word, get_wordnet_pos(pos)))
+        sent_lemmas.append(lemmas)
+    return sent_lemmas
 
 
 def lemmatize(words):
-    wnl = WordNetLemmatizer()
     lemmas = []
     for word, pos in pos_tag(words):
         lemmas.append(wnl.lemmatize(word, get_wordnet_pos(pos)))
@@ -94,10 +116,6 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
     text = strip_html(text)
     text = remove_spaces(text)
     text = remove_non_ascii(text)
-
-    # correct spelling
-    # text = spell(text)
-
     # expand contractions
     text = contractions.fix(text)
 
@@ -107,14 +125,16 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
             sent = remove_special_chars(sent)
             tokens = word_tokenize(sent)
             tokens = normalize(tokens, lowercase=lowercase)
-            lemmas = lemmatize(tokens)
 
-            if len(lemmas) > 0:
-                sent_tokens.append(lemmas)
+            if len(tokens) > 0:
+                sent_tokens.append(tokens)
+
+        sent_lemmas = lemmatize_sentences(sent_tokens)
+
         if return_tokens:
-            return sent_tokens
+            return sent_lemmas
         else:
-            return [" ".join(sent) for sent in sent_tokens]
+            return [" ".join(sent) for sent in sent_lemmas]
     else:
         text = remove_special_chars(text)
         tokens = word_tokenize(text)
