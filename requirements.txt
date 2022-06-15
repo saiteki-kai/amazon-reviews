@@ -117,9 +117,11 @@ QtPy==2.1.0
 regex==2022.6.2
 requests==2.28.0
 requests-toolbelt==0.9.1
+-e git+ssh://git@github.com/saiteki-kai/amazon-reviews.git@269412386c4eb24bfb906a3593fd22430a5cae9e#egg=reviews
 rich==12.2.0
 scikit-learn==1.1.1
 scipy==1.8.1
+seaborn==0.11.2
 Send2Trash==1.8.0
 six==1.16.0
 sklearn==0.0
@@ -142,6 +144,7 @@ tqdm==4.64.0
 traitlets==5.2.2.post1
 typing_extensions==4.2.0
 urllib3==1.26.9
+virtualenv==20.14.1
 wcwidth==0.2.5
 webencodings==0.5.1
 Werkzeug==2.1.2
