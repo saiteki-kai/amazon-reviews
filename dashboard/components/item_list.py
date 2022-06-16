@@ -1,24 +1,18 @@
+from math import floor
+
 import dash_bootstrap_components as dbc
 import pandas as pd
-from dash import html
+from dash import Input, Output, html
 
+from dashboard.app import app
 from reviews.config import processed_data_dir
+
+PAGE_SIZE = 50
 
 reviews_df = pd.read_json(
     processed_data_dir / "reviews_digital_cameras.json.gz", orient="records"
 )
-reviews_df = reviews_df.sample(10)
-
-table_header = html.Thead(
-    html.Tr(
-        [
-            html.Th("Text"),
-            html.Th("Vote", style={"width": "120px"}),
-            html.Th("Sentiment", style={"width": "10%"}),
-            html.Th("Topics", style={"width": "10%"}),
-        ],
-    ),
-)
+total = len(reviews_df)
 
 
 def vote(stars):
@@ -46,17 +40,71 @@ def row_item(row):
     )
 
 
-table_body = html.Tbody(reviews_df.apply(row_item, axis=1))
+@app.callback(
+    Output("items", "children"),
+    Input("pagination", "active_page"),
+)
+def update_table(page):
+    if not page:
+        page = 1
+
+    page_idx = page - 1
+
+    start = page_idx * PAGE_SIZE
+    end = (page_idx + 1) * PAGE_SIZE
+
+    return reviews_df.iloc[start:end].apply(row_item, axis=1)
+
+
+table_header = html.Thead(
+    html.Tr(
+        [
+            html.Th("Text"),
+            html.Th("Vote", style={"width": "15%"}),
+            html.Th("Sentiment", style={"width": "15%"}),
+            html.Th("Topics", style={"width": "15%"}),
+        ],
+    ),
+)
+
+table_body = html.Tbody(
+    id="items",
+)
+
 
 item_list = html.Div(
     id="item-list",
-    className="col-12",
-    children=[
-        dbc.Table(
-            children=[
-                table_header,
-                table_body,
-            ],
-        ),
-    ],
+    className="col-9",
+    children=dbc.Card(
+        [
+            dbc.CardHeader(
+                html.H6("Reviews", className="m-2"),
+            ),
+            dbc.CardBody(
+                children=[
+                    dbc.Table(
+                        children=[
+                            table_header,
+                            table_body,
+                        ],
+                    ),
+                ],
+            ),
+            dbc.CardFooter(
+                className="py-2 mx-2",
+                children=[
+                    html.Small(
+                        f"Showing {PAGE_SIZE} items out of {total} results",
+                        className="text-muted",
+                    ),
+                    dbc.Pagination(
+                        id="pagination",
+                        max_value=floor(total / PAGE_SIZE),
+                        fully_expanded=False,
+                        previous_next=True,
+                    ),
+                ],
+            ),
+        ],
+    ),
 )

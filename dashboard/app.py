@@ -1,7 +1,5 @@
 import dash_bootstrap_components as dbc
-from dash import Dash, html
-
-from dashboard.components.item_list import item_list
+from dash import Dash
 
 external_stylesheets = [
     dbc.themes.BOOTSTRAP,
@@ -12,13 +10,3 @@ external_stylesheets = [
 ]
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
-
-app.layout = html.Div(
-    id="container",
-    className="fluid-container",
-    children=item_list,
-)
-
-
-if __name__ == "__main__":
-    app.run_server(debug=True)

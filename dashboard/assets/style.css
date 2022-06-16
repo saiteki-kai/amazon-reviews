@@ -12,20 +12,87 @@ body {
 }
 
 #item-list {
+  padding: 1.5rem;
   height: 100vh;
-  overflow-y: scroll;
 }
 
-#item-list > table {
+.card {
+  border-radius: 8px;
+}
+
+.card-header:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.card-footer:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+#item-list .card {
+  height: 100%;
+}
+
+#item-list .card-body {
+  overflow-y: scroll;
+  padding: 0;
+}
+
+#item-list .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#item-list .card-footer,
+#item-list .card-header {
+  background-color: white;
+}
+
+.pagination {
+  justify-content: center;
+  margin: 0;
+}
+
+#item-list table {
   border-collapse: separate;
   border-spacing: 0;
+  table-layout: fixed; 
   margin: 0px;
-  width: 100%;
 }
 
 #item-list thead {
   position: sticky;
   top: 0;
-  background-color: white;
-  border-bottom: 1px solid black;
+  background-color: #ededed;
+}
+
+#item-list th {
+  color: gray;
+  font-weight: normal;
+  text-transform: uppercase;
+  font-size: small;
+}
+
+#item-list td:first-child, th:first-child {
+  padding-left: 24px;
+}
+
+/* Hide the last border */
+.table>:not(caption)>*:last-child>* {
+  border-bottom-width: 0;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  background-color: #ededed;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #00000052;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  margin-block-start: 36px;
+  background-color: #20202000;
 }
