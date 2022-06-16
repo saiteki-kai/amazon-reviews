@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  --bs-gutter-x: 0;
+}
+
+.bi {
+  padding-right: 2px;
+}
+
+#item-list {
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+#item-list > table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0px;
+  width: 100%;
+}
+
+#item-list thead {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  border-bottom: 1px solid black;
+}
