@@ -5,13 +5,11 @@ import pandas as pd
 from dash import Input, Output, html
 
 from dashboard.app import app
-from reviews.config import processed_data_dir
+from reviews.config import asum_output_dir
 
 PAGE_SIZE = 50
 
-reviews_df = pd.read_json(
-    processed_data_dir / "reviews_digital_cameras.json.gz", orient="records"
-)
+reviews_df = pd.read_json(asum_output_dir / "topics.json", orient="records")
 total = len(reviews_df)
 
 
@@ -24,18 +22,21 @@ def vote(stars):
     )
 
 
+def topic_badge(topic):
+    return dbc.Badge(
+        f"Topic {topic['topic'] + 1}",
+        className="me-1",
+        color="green" if topic["sentiment"] == 0 else "red",
+    )
+
+
 def row_item(row):
     return html.Tr(
         [
             html.Td(row["text"]),
             html.Td(vote(row["overall"])),
-            html.Td("Positive"),
-            html.Td(
-                [
-                    dbc.Badge("Topic 1", className="me-1"),
-                    dbc.Badge("Topic 2", className="me-1"),
-                ],
-            ),
+            html.Td(str(row["sentiment"]).capitalize()),
+            html.Td(list(map(topic_badge, row["topics"]))),
         ],
     )
 
