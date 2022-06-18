@@ -22,6 +22,7 @@ dash==2.4.1
 dash-bootstrap-components==1.1.0
 dash-core-components==2.0.0
 dash-html-components==2.0.0
+dash-renderer==1.9.1
 dash-table==5.0.0
 dask==2022.5.2
 debugpy==1.6.0
@@ -35,6 +36,7 @@ entrypoints==0.4
 executing==0.8.3
 fastjsonschema==2.15.3
 filelock==3.7.1
+flake8==4.0.1
 Flask==2.1.2
 Flask-Compress==1.12
 fonttools==4.33.3
@@ -65,7 +67,7 @@ locket==1.0.0
 MarkupSafe==2.1.1
 matplotlib==3.5.2
 matplotlib-inline==0.1.3
-mccabe==0.7.0
+mccabe==0.6.1
 mistune==0.8.4
 mypy-extensions==0.4.3
 nbclient==0.6.4
@@ -98,7 +100,9 @@ psutil==5.9.1
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pyahocorasick==1.4.4
+pycodestyle==2.8.0
 pycparser==2.21
+pyflakes==2.4.0
 PyGithub==1.55
 Pygments==2.12.0
 PyJWT==2.4.0
@@ -117,7 +121,6 @@ QtPy==2.1.0
 regex==2022.6.2
 requests==2.28.0
 requests-toolbelt==0.9.1
--e git+ssh://git@github.com/saiteki-kai/amazon-reviews.git@269412386c4eb24bfb906a3593fd22430a5cae9e#egg=reviews
 rich==12.2.0
 scikit-learn==1.1.1
 scipy==1.8.1
@@ -144,7 +147,6 @@ tqdm==4.64.0
 traitlets==5.2.2.post1
 typing_extensions==4.2.0
 urllib3==1.26.9
-virtualenv==20.14.1
 wcwidth==0.2.5
 webencodings==0.5.1
 Werkzeug==2.1.2
