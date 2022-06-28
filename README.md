@@ -2,6 +2,9 @@
 
 An aspect based sentiment analysis on Amazon reviews.
 
+paper:
+> https://cseweb.ucsd.edu//~jmcauley/pdfs/emnlp19a.pdf
+
 ## ASUM
 
 Positive and negative word lists were used of the following repository:
@@ -27,6 +30,7 @@ pre-commit install
 Create a virtual environment
 
 ```bash
+pip install virtualenv
 virtualenv venv
 source venv/bin/activate
 ```
