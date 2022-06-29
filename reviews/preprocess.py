@@ -148,7 +148,4 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
     if return_tokens:
         return lemmas
 
-    print(lemmas)
-
-
     return " ".join(lemmas)
