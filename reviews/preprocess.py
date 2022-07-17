@@ -6,7 +6,7 @@ import contractions
 import nltk
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords, wordnet
-from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.tag import pos_tag, pos_tag_sents
 from nltk.tokenize import sent_tokenize, word_tokenize
 from symspellpy import SymSpell, Verbosity
@@ -21,6 +21,8 @@ STOPWORDS = set(stopwords.words("english"))
 STOPWORDS.remove("not")
 STOPWORDS.remove("nor")
 STOPWORDS.remove("against")
+STOPWORDS.add("camera")
+
 
 # Regular expressions
 
@@ -50,6 +52,9 @@ with importlib.resources.path("symspellpy", RESOURCE_NAME) as dictionary_path:
 # init lemmatizer
 wnl = WordNetLemmatizer()
 
+# init Stemmer
+ps = PorterStemmer()
+
 
 def remove_urls(text):
     return URL_RE.sub("", text)
@@ -73,6 +78,7 @@ def remove_non_ascii(text):
 
 
 def remove_special_chars(text):
+    text = text.replace("-", " ")  # split dashes
     text = text.replace("/", " ")  # split slashes
     return ALPHA_RE.sub("", text)
 
@@ -113,7 +119,30 @@ def lemmatize(words):
     return lemmas
 
 
-def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
+def stemming_sentences(sentences):
+    sent_stems = []
+    for sent in sentences:
+        stems = []
+        for word in sent:
+            stems.append(ps.stem(word))
+        sent_stems.append(stems)
+    return sent_stems
+
+
+def stemming(words):
+    stems = []
+    for word in words:
+        stems.append(ps.stem(word))
+    return stems
+
+
+def preprocess(
+    text,
+    lowercase=True,
+    sentences=True,
+    return_tokens=True,
+    lemmatization=True,
+):
     # text cleaning
     text = remove_urls(text)
     text = strip_html(text)
@@ -133,19 +162,28 @@ def preprocess(text, lowercase=True, sentences=True, return_tokens=True):
             if len(tokens) > 0:
                 sent_tokens.append(tokens)
 
-        sent_lemmas = lemmatize_sentences(sent_tokens)
+        sent_tokens_ready = sent_tokens
+        if lemmatization:
+            sent_tokens_ready = lemmatize_sentences(sent_tokens)
+        else:
+            sent_tokens_ready = stemming_sentences(sent_tokens)
 
         if return_tokens:
-            return sent_lemmas
+            return sent_tokens_ready
 
-        return [" ".join(sent) for sent in sent_lemmas]
+        return [" ".join(sent) for sent in sent_tokens_ready]
 
     text = remove_special_chars(text)
     tokens = word_tokenize(text)
     tokens = normalize(tokens, lowercase=lowercase)
-    lemmas = lemmatize(tokens)
+
+    tokens_ready = tokens
+    if lemmatization:
+        tokens_ready = lemmatize(tokens)
+    else:
+        tokens_ready = stemming(tokens)
 
     if return_tokens:
-        return lemmas
+        return tokens_ready
 
-    return " ".join(lemmas)
+    return " ".join(tokens_ready)
