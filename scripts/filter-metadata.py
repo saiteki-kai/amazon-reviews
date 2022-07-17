@@ -2,9 +2,6 @@ import pandas as pd
 import gzip
 import json
 
-import sys;
-sys.path.append('.')
-
 from reviews.config import raw_data_dir, processed_data_dir
 
 fields_to_remove = set(

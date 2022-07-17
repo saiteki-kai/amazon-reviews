@@ -1,0 +1,16 @@
+PRODUCTS:
+
+- mancano gran parte dei prezzi dei prodotti
+- ci sono dei prodotti del 1973 anche se il dataset dovrebbe contenere dati dal 1996 al 2018
+	macchine fotografiche storiche ???
+
+
+REVIEWS:
+- nessun valore nullo
+
+
+
+PRODUCTS AND REVIEWS:
+- i dati che non hanno prezzo hanno per caso più review?? inoltre in quelle review quante volte viene menzionato il prezzo??
+- la wordcloud sui brand cambia, compaiono brand che prima non si vedevano e scompaiono brand anche molto famosi
+- interessante sarebbe osservare in base alla media di voti, di numero di voti utili come cambia la wordcloud
