@@ -48,7 +48,7 @@ df["vote"] = df["vote"].str.replace(",", "").fillna(0).astype("uint16")
 df["asin"] = df["asin"].astype("category")
 df["summary"] = df["summary"].astype("string")
 df["text"] = df["text"].astype("string")
-df["timestamp"] = pd.to_datetime(df["timestamp"])
+# df["timestamp"] = pd.to_datetime(df["timestamp"])
 
 df.info(verbose=True, memory_usage="deep")
 
