@@ -26,7 +26,7 @@ STOPWORDS.add("camera")
 # Regular expressions
 
 URL_RE = re.compile(
-    r"http[s]?://(?:[a-z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-f][0-9a-f]))+"  # noqa: E501
+    r"(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})"  # noqa: E501
 )
 
 SPACES_RE = re.compile(" +")
@@ -39,7 +39,7 @@ DOTS_RE = re.compile(r"\.{2,}")
 NUM_RE = re.compile(r"(\d*\.?\d+(\w+)?)", flags=re.MULTILINE)
 
 DOT_SENT_RE = re.compile(
-    r"([^\d., ]{2,})\.((?!com|net|txt)[a-zA-Z]{3,})", flags=re.MULTILINE
+    r"([^\d.,\s]{2,})\.((?!com|net|txt)[a-zA-Z]+)", flags=re.MULTILINE
 )
 
 REP_CHAR_RE = re.compile(r"([A-Za-z])\1+", re.DOTALL)
@@ -97,7 +97,7 @@ def fix_punctuation(text):
 
 def remove_special_chars(text):
     text = text.replace("-", " ")  # split dashes
-    text = text.replace("/", " ")  # split slashes
+    text = re.sub(r"/+|\\+", " ", text)  # split slashes
     text = text.replace("+", " ")  # split pluses
 
     return DOTS_RE.sub(" ", text)  # add a space after multiple dots
