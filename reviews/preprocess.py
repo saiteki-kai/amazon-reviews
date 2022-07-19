@@ -35,7 +35,6 @@ ALPHA_RE = re.compile(r"[^a-zA-Z\s]")
 
 DOTS_RE = re.compile(r"\.{2,}")
 
-
 NUM_RE = re.compile(r"(\d*\.?\d+(\w+)?)", flags=re.MULTILINE)
 
 DOT_SENT_RE = re.compile(
@@ -107,14 +106,17 @@ def remove_repetitions(text):
     return REP_CHAR_RE.sub(r"\1\1", text)
 
 
-def normalize(words, lowercase=False):
+def normalize(words, lowercase=False, correct_spelling=True):
     tokens = []
     for word in words:
-        # append words other than stopwords and punctuation
-        if word.lower() not in STOPWORDS and not ALPHA_RE.match(word):
+        # remove punctuation
+        word = ALPHA_RE.sub("", word)
+
+        # append words other than stopwords
+        if len(word) != 0 and word.lower() not in STOPWORDS:
             token = remove_repetitions(word)
 
-            if len(word) > 3:
+            if len(word) > 3 and correct_spelling:
                 suggestions = speller.lookup(
                     word,
                     Verbosity.TOP,
@@ -176,6 +178,7 @@ def preprocess(
     sentences=True,
     return_tokens=True,
     lemmatization=True,
+    correct_spelling=True,
 ):
     # text cleaning
     text = remove_urls(text)
@@ -193,7 +196,11 @@ def preprocess(
         for sent in sent_tokenize(text):
             sent = remove_special_chars(sent)
             tokens = word_tokenize(sent)
-            tokens = normalize(tokens, lowercase=lowercase)
+            tokens = normalize(
+                tokens,
+                lowercase=lowercase,
+                correct_spelling=correct_spelling,
+            )
 
             if len(tokens) > 0:
                 sent_tokens.append(tokens)
@@ -210,7 +217,11 @@ def preprocess(
 
     text = remove_special_chars(text)
     tokens = word_tokenize(text)
-    tokens = normalize(tokens, lowercase=lowercase)
+    tokens = normalize(
+        tokens,
+        lowercase=lowercase,
+        correct_spelling=correct_spelling,
+    )
 
     if lemmatization:
         tokens = lemmatize(tokens)
