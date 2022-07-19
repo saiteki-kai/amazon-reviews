@@ -32,7 +32,7 @@ URL_RE = re.compile(
 
 SPACES_RE = re.compile(" +")
 
-ALPHA_RE = re.compile(r"[^a-zA-z\s]")
+ALPHA_RE = re.compile(r"[^a-zA-Z\s]")
 
 
 WORDNET_TAGS = {
