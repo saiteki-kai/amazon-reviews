@@ -138,6 +138,7 @@ terminado==0.15.0
 textsearch==0.0.21
 threadpoolctl==3.1.0
 tinycss2==1.1.1
+tokenize-rt==4.2.1
 toml==0.10.2
 tomli==2.0.1
 toolz==0.11.2
@@ -147,6 +148,7 @@ tqdm==4.64.0
 traitlets==5.2.2.post1
 typing_extensions==4.2.0
 urllib3==1.26.9
+virtualenv==20.15.1
 wcwidth==0.2.5
 webencodings==0.5.1
 Werkzeug==2.1.2
