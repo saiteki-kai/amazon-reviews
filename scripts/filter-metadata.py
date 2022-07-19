@@ -1,8 +1,9 @@
-import pandas as pd
 import gzip
 import json
 
-from reviews.config import raw_data_dir, processed_data_dir
+import pandas as pd
+
+from reviews.config import processed_data_dir, raw_data_dir
 
 fields_to_remove = set(
     [
@@ -25,8 +26,8 @@ fields_to_remove = set(
 # load data
 data = []
 with gzip.open(raw_data_dir / "meta_Electronics.json.gz") as f:
-    for l in f:
-        prod = json.loads(l.strip())
+    for line in f:
+        prod = json.loads(line.strip())
 
         # filter category
         sub_categories = list(prod["category"])
@@ -43,7 +44,7 @@ with gzip.open(raw_data_dir / "meta_Electronics.json.gz") as f:
 df = pd.DataFrame.from_dict(data)
 print(len(df))
 
-# remove rows with unformatted title (i.e. some 'title' may still contain html style content)
+# remove rows with unformatted title (some 'title' may contain html content)
 df = df.fillna("")
 df = df[~df.title.str.contains("getTime")]
 print(len(df))

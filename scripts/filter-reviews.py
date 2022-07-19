@@ -1,11 +1,12 @@
-import pandas as pd
 import gzip
 import json
 
-from reviews.config import raw_data_dir, processed_data_dir
+import pandas as pd
+
+from reviews.config import processed_data_dir, raw_data_dir
 
 # get asin codes
-prod_df =  pd.read_json(processed_data_dir / "meta_digital_cameras.json.gz")
+prod_df = pd.read_json(processed_data_dir / "meta_digital_cameras.json.gz")
 asin = set(prod_df["asin"])
 print("Products Metadata Loaded")
 
@@ -13,30 +14,40 @@ i = 0
 k = 0
 data = []
 with gzip.open(raw_data_dir / "Electronics_5.json.gz") as f:
-  for l in f:
-    review = json.loads(l.strip())
-    
-    if review.get("asin") in asin:
-      # remove unwanted fields
-      for field in ["reviewTime", "verified", "style", "reviewerID", "reviewerName", "image"]:
-        review.pop(field, None)
+    for line in f:
+        review = json.loads(line.strip())
 
-      # append the review
-      if review.get("reviewText") and review.get("summary"):
-        data.append(review)
-        i = i + 1
+        if review.get("asin") in asin:
+            # remove unwanted fields
+            for field in [
+                "reviewTime",
+                "verified",
+                "style",
+                "reviewerID",
+                "reviewerName",
+                "image",
+            ]:
+                review.pop(field, None)
 
-    # progress
-    if k % 50000 == 0:
-      print(f"{i} / {k}")
-    k = k + 1
+            # append the review
+            if review.get("reviewText") and review.get("summary"):
+                data.append(review)
+                i = i + 1
+
+        # progress
+        if k % 50000 == 0:
+            print(f"{i} / {k}")
+        k = k + 1
 
 print("finished")
 
 df = pd.DataFrame(data)
 
 # rename columns
-df.rename(columns={"unixReviewTime": "timestamp", "reviewText": "text"}, inplace=True)
+df.rename(
+    columns={"unixReviewTime": "timestamp", "reviewText": "text"},
+    inplace=True,
+)
 
 # delete duplicates
 df.drop_duplicates(inplace=True)
@@ -52,4 +63,8 @@ df["text"] = df["text"].astype("string")
 
 df.info(verbose=True, memory_usage="deep")
 
-df.to_json(processed_data_dir / "reviews_digital_cameras.json.gz", orient="records", compression="gzip")
+df.to_json(
+    processed_data_dir / "reviews_digital_cameras.json.gz",
+    orient="records",
+    compression="gzip",
+)
