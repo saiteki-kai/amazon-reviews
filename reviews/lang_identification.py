@@ -3,7 +3,7 @@ import fasttext
 
 class LanguageIdentification:
     def __init__(self):
-        pretrained_lang_model = "lid.176.bin"
+        pretrained_lang_model = "/tmp/lid.176.bin"
         self.model = fasttext.load_model(pretrained_lang_model)
 
     def predict_lang(self, text):
