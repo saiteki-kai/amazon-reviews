@@ -34,6 +34,7 @@ SPACES_RE = re.compile(" +")
 
 ALPHA_RE = re.compile(r"[^a-zA-Z\s]")
 
+DOTS_RE = re.compile(r"\.{2,}")
 
 WORDNET_TAGS = {
     "N": wordnet.NOUN,
@@ -80,7 +81,9 @@ def remove_non_ascii(text):
 def remove_special_chars(text):
     text = text.replace("-", " ")  # split dashes
     text = text.replace("/", " ")  # split slashes
-    return ALPHA_RE.sub("", text)
+    text = text.replace("+", " ")  # split pluses
+
+    return DOTS_RE.sub(" ", text)  # add a space after multiple dots
 
 
 def normalize(words, lowercase=False):
