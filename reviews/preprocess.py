@@ -162,28 +162,26 @@ def preprocess(
             if len(tokens) > 0:
                 sent_tokens.append(tokens)
 
-        sent_tokens_ready = sent_tokens
         if lemmatization:
-            sent_tokens_ready = lemmatize_sentences(sent_tokens)
+            sent_tokens = lemmatize_sentences(sent_tokens)
         else:
-            sent_tokens_ready = stemming_sentences(sent_tokens)
+            sent_tokens = stemming_sentences(sent_tokens)
 
         if return_tokens:
-            return sent_tokens_ready
+            return sent_tokens
 
-        return [" ".join(sent) for sent in sent_tokens_ready]
+        return [" ".join(sent) for sent in sent_tokens]
 
     text = remove_special_chars(text)
     tokens = word_tokenize(text)
     tokens = normalize(tokens, lowercase=lowercase)
 
-    tokens_ready = tokens
     if lemmatization:
-        tokens_ready = lemmatize(tokens)
+        tokens = lemmatize(tokens)
     else:
-        tokens_ready = stemming(tokens)
+        tokens = stemming(tokens)
 
     if return_tokens:
-        return tokens_ready
+        return tokens
 
-    return " ".join(tokens_ready)
+    return " ".join(tokens)
