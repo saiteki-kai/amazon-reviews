@@ -23,7 +23,6 @@ STOPWORDS.remove("nor")
 STOPWORDS.remove("against")
 STOPWORDS.add("camera")
 
-
 # Regular expressions
 
 URL_RE = re.compile(
@@ -35,6 +34,15 @@ SPACES_RE = re.compile(" +")
 ALPHA_RE = re.compile(r"[^a-zA-Z\s]")
 
 DOTS_RE = re.compile(r"\.{2,}")
+
+
+NUM_RE = re.compile(r"(\d*\.?\d+(\w+)?)", flags=re.MULTILINE)
+
+DOT_SENT_RE = re.compile(
+    r"([^\d., ]{2,})\.((?!com|net|txt)[a-zA-Z]{3,})", flags=re.MULTILINE
+)
+
+REP_CHAR_RE = re.compile(r"([A-Za-z])\1+", re.DOTALL)
 
 WORDNET_TAGS = {
     "N": wordnet.NOUN,
@@ -78,6 +86,15 @@ def remove_non_ascii(text):
     )
 
 
+def remove_numbers(text):
+    return NUM_RE.sub("", text)
+
+
+def fix_punctuation(text):
+    text = text.replace(",", ", ")  # split commas
+    return DOT_SENT_RE.sub(r"\g<1>. \g<2>", text)  # split dots
+
+
 def remove_special_chars(text):
     text = text.replace("-", " ")  # split dashes
     text = text.replace("/", " ")  # split slashes
@@ -86,17 +103,31 @@ def remove_special_chars(text):
     return DOTS_RE.sub(" ", text)  # add a space after multiple dots
 
 
+def remove_repetitions(text):
+    return REP_CHAR_RE.sub(r"\1\1", text)
+
+
 def normalize(words, lowercase=False):
     tokens = []
     for word in words:
-        if lowercase:
-            word = word.lower()
-        if word.lower() not in STOPWORDS:
-            suggestions = speller.lookup(word, Verbosity.CLOSEST)
-            if len(suggestions) > 0:
-                tokens.append(suggestions[0].term)
-            else:
-                tokens.append(word)
+        # append words other than stopwords and punctuation
+        if word.lower() not in STOPWORDS and not ALPHA_RE.match(word):
+            token = remove_repetitions(word)
+
+            if len(word) > 3:
+                suggestions = speller.lookup(
+                    word,
+                    Verbosity.TOP,
+                    transfer_casing=True,
+                )
+                if len(suggestions) > 0:
+                    token = suggestions[0].term
+
+            if lowercase:
+                token = token.lower()
+
+            tokens.append(token)
+
     return tokens
 
 
@@ -151,6 +182,8 @@ def preprocess(
     text = strip_html(text)
     text = remove_spaces(text)
     text = remove_non_ascii(text)
+    text = remove_numbers(text)
+    text = fix_punctuation(text)
 
     # expand contractions
     text = contractions.fix(text)
