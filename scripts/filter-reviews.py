@@ -6,7 +6,7 @@ import pandas as pd
 from reviews.config import processed_data_dir, raw_data_dir
 
 # get asin codes
-prod_df = pd.read_json(processed_data_dir / "meta_digital_cameras.json.gz")
+prod_df = pd.read_json(processed_data_dir / "meta.json.gz")
 asin = set(prod_df["asin"])
 print("Products Metadata Loaded")
 
@@ -64,7 +64,7 @@ df["text"] = df["text"].astype("string")
 df.info(verbose=True, memory_usage="deep")
 
 df.to_json(
-    processed_data_dir / "reviews_digital_cameras.json.gz",
+    processed_data_dir / "reviews.json.gz",
     orient="records",
     compression="gzip",
 )

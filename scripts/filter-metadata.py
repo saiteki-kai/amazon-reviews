@@ -10,6 +10,7 @@ fields_to_remove = set(
         "tech1",
         "tech2",
         # "brand",
+        "main_cat",
         "feature",
         "rank",
         "fit",
@@ -20,6 +21,7 @@ fields_to_remove = set(
         "imageURL",
         "imageURLHighRes",
         "details",
+        "date",
     ]
 )
 
@@ -32,9 +34,10 @@ with gzip.open(raw_data_dir / "meta_Electronics.json.gz") as f:
         # filter category
         sub_categories = list(prod["category"])
         if (
-            len(sub_categories) > 2
-            and sub_categories[1] == "Camera & Photo"
-            and sub_categories[2] == "Digital Cameras"
+            len(sub_categories) > 4
+            and sub_categories[1] == "Computers & Accessories"
+            and sub_categories[2] == "Computer Components"
+            and sub_categories[3] == "Internal Components"
         ):
             # remove unwanted fields
             [prod.pop(field, None) for field in fields_to_remove]
@@ -55,7 +58,7 @@ print(len(df))
 
 # save the data frame
 df.to_json(
-    processed_data_dir / "meta_digital_cameras.json.gz",
+    processed_data_dir / "meta.json.gz",
     orient="records",
     compression="gzip",
 )
