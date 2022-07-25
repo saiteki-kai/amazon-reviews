@@ -1,8 +1,8 @@
 import re
 import unicodedata
+import warnings
 
 import contractions
-import demoji
 import nltk
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords, wordnet
@@ -16,6 +16,8 @@ nltk.download("punkt", quiet=True)
 nltk.download("wordnet", quiet=True)
 nltk.download("omw-1.4", quiet=True)
 nltk.download("averaged_perceptron_tagger", quiet=True)
+
+warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
 
 STOPWORDS = set(stopwords.words("english"))
 
@@ -72,17 +74,6 @@ def remove_non_ascii(text):
         .encode("ascii", "ignore")
         .decode("utf-8", "ignore")
     )
-
-
-def handle_emoji(text):
-    emoji_dict = demoji.findall(text)
-    for key in emoji_dict:
-        # lower case and remove spaces & tabs
-        emoji_normalized = emoji_dict[key]
-        emoji_normalized = emoji_normalized.lower()
-        emoji_normalized = re.sub(re.compile(r"\s+"), "", emoji_normalized)
-        text = text.replace(key, emoji_normalized)
-    return text
 
 
 def remove_numbers(text):
@@ -159,7 +150,6 @@ def preprocess(
     text = remove_urls(text)
     text = strip_html(text)
     text = remove_spaces(text)
-    text = handle_emoji(text)
     text = remove_non_ascii(text)
     text = remove_numbers(text)
     text = fix_punctuation(text)
