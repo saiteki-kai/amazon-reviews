@@ -19,14 +19,14 @@ with gzip.open(raw_data_dir / "Electronics_5.json.gz") as f:
 
         if review.get("asin") in asin:
             # remove unwanted fields
-            for field in [
+            for field in {
                 "reviewTime",
                 "verified",
                 "style",
                 "reviewerID",
                 "reviewerName",
                 "image",
-            ]:
+            }:
                 review.pop(field, None)
 
             # append the review
