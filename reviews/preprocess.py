@@ -1,6 +1,5 @@
 import re
 import unicodedata
-import warnings
 
 import contractions
 import nltk
@@ -17,8 +16,6 @@ nltk.download("wordnet", quiet=True)
 nltk.download("omw-1.4", quiet=True)
 nltk.download("averaged_perceptron_tagger", quiet=True)
 
-warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
-
 STOPWORDS = set(stopwords.words("english"))
 
 # Regular expressions
@@ -33,7 +30,7 @@ ALPHA_RE = re.compile(r"[^a-zA-Z\s]")
 
 SPLIT_RE = re.compile(r"/+|\\+|\+|-|\.{2,}")
 
-NUM_RE = re.compile(r"(\d*\.?\d+(\w+)?)", flags=re.MULTILINE)
+NUM_RE = re.compile(r"(\d*[.,]?\d+(\w+)?)", flags=re.MULTILINE)
 
 DOT_SENT_RE = re.compile(
     r"([^\d.,\s]{2,})\.((?!com|net|txt)[a-zA-Z]+)", flags=re.MULTILINE
@@ -55,20 +52,25 @@ wnl = WordNetLemmatizer()
 ss = SnowballStemmer("english")
 
 
-def remove_urls(text):
+def remove_urls(text: str):
+    """Remove URLs."""
     return URL_RE.sub("", text)
 
 
-def remove_spaces(text):
+def remove_spaces(text: str):
+    """Remove unnecessary spaces by keeping one."""
     return SPACES_RE.sub(" ", text)
 
 
-def strip_html(text):
+def strip_html(text: str):
+    """Remove html tags and replace html entities."""
     soup = BeautifulSoup(text, "html.parser")
+
     return soup.get_text()
 
 
-def remove_non_ascii(text):
+def remove_non_ascii(text: str):
+    """Replace non-ASCII characters with ASCII ones."""
     return (
         unicodedata.normalize("NFKD", text)
         .encode("ascii", "ignore")
@@ -76,21 +78,25 @@ def remove_non_ascii(text):
     )
 
 
-def remove_numbers(text):
+def remove_numbers(text: str):
+    """Remove the numbers with their units of measurement."""
     return NUM_RE.sub("", text)
 
 
-def fix_punctuation(text):
+def fix_punctuation(text: str):
+    """Spaces commas and dots."""
     text = text.replace(",", ", ")  # split commas
+
     return DOT_SENT_RE.sub(r"\g<1>. \g<2>", text)  # split dots
 
 
-# replace dashes, slashes, pluses and multiple dots with a space
-def space_special_chars(text):
+def space_special_chars(text: str):
+    """Replace dashes, slashes, pluses and multiple dots with a space."""
     return SPLIT_RE.sub(" ", text)
 
 
-def remove_repetitions(text):
+def remove_repetitions(text: str):
+    """Remove repeating alphabetic characters."""
     return REP_CHAR_RE.sub(r"\1\1", text)
 
 
