@@ -23,9 +23,11 @@ dash-table==5.0.0
 debugpy==1.6.2
 decorator==5.1.1
 defusedxml==0.7.1
+demoji==1.1.0
 Deprecated==1.2.13
 dill==0.3.5.1
 entrypoints==0.4
+exceptiongroup==1.0.0
 executing==0.9.0
 fastjsonschema==2.16.1
 fasttext==0.9.2
@@ -35,6 +37,7 @@ Flask-Compress==1.12
 fonttools==4.34.4
 humanize==4.2.3
 idna==3.3
+iniconfig==1.1.1
 ipykernel==6.15.1
 ipython==8.4.0
 ipython-genutils==0.2.0
@@ -77,6 +80,7 @@ pickleshare==0.7.5
 Pillow==9.2.0
 platformdirs==2.5.2
 plotly==5.9.0
+pluggy==1.0.0
 prometheus-client==0.14.1
 prompt-toolkit==3.0.30
 psutil==5.9.1
@@ -93,6 +97,7 @@ PyJWT==2.4.0
 PyNaCl==1.5.0
 pyparsing==3.0.9
 pyrsistent==0.18.1
+pytest==7.2.0
 python-dateutil==2.8.2
 python-decouple==3.6
 python-gitlab==3.6.0
@@ -114,6 +119,7 @@ tenacity==8.0.1
 terminado==0.15.0
 textsearch==0.0.21
 tinycss2==1.1.1
+tokenize-rt==4.2.1
 tomli==2.0.1
 tornado==6.2
 tqdm==4.64.0
