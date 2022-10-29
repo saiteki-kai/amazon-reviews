@@ -5,25 +5,21 @@ import pandas as pd
 
 from reviews.config import processed_data_dir, raw_data_dir
 
-fields_to_remove = set(
-    [
-        "tech1",
-        "tech2",
-        # "brand",
-        "main_cat",
-        "feature",
-        "rank",
-        "fit",
-        "also_buy",
-        "also_view",
-        "similar_item",
-        # "price",
-        "imageURL",
-        "imageURLHighRes",
-        "details",
-        "date",
-    ]
-)
+fields_to_remove = {
+    "tech1",
+    "tech2",
+    "main_cat",
+    "feature",
+    "rank",
+    "fit",
+    "also_buy",
+    "also_view",
+    "similar_item",
+    "imageURL",
+    "imageURLHighRes",
+    "details",
+    "date",
+}
 
 # load data
 data = []
@@ -44,7 +40,7 @@ with gzip.open(raw_data_dir / "meta_Electronics.json.gz") as f:
             data.append(prod)
 
 # create the data frame
-df = pd.DataFrame.from_dict(data)
+df = pd.DataFrame(data)
 print(len(df))
 
 # remove rows with unformatted title (some 'title' may contain html content)
