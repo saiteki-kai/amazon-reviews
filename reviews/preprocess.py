@@ -5,11 +5,13 @@ import warnings
 import contractions
 import nltk
 from bs4 import BeautifulSoup
-from nltk.corpus import stopwords, wordnet
+from nltk.corpus import wordnet
 from nltk.sentiment.util import mark_negation
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
 from nltk.tag import pos_tag, pos_tag_sents
 from nltk.tokenize import sent_tokenize, word_tokenize
+
+from reviews.config import data_dir
 
 nltk.download("stopwords", quiet=True)
 nltk.download("punkt", quiet=True)
@@ -19,7 +21,11 @@ nltk.download("averaged_perceptron_tagger", quiet=True)
 
 warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
 
-STOPWORDS = set(stopwords.words("english"))
+
+with open(data_dir / "stopwords.csv", "r") as f:
+    STOPWORDS = set(f.read().split(","))
+
+# STOPWORDS = set(stopwords.words("english"))
 
 # Regular expressions
 
@@ -119,7 +125,7 @@ def normalize(
         token = ALPHA_RE.sub("", token)
         token = remove_repetitions(token)
 
-        if len(token) > 0 and token.lower() not in STOPWORDS:
+        if len(token) > 0:
             if lowercase:
                 token = token.lower()
 
@@ -130,10 +136,11 @@ def normalize(
             if stemming:
                 token = ss.stem(token)
 
-            if negs[i]:
-                token = token + "_NEG"
+            if token.lower() not in STOPWORDS:
+                if negs[i]:
+                    token = "not_" + token
 
-            normalized_tokens.append(token)
+                normalized_tokens.append(token)
 
     return normalized_tokens
 
