@@ -1,5 +1,6 @@
 import subprocess
 from pathlib import Path
+from sys import platform
 
 from reviews.models.base import BaseModel
 
@@ -13,9 +14,11 @@ class JST(BaseModel):
         )
 
     def estimate(self, alpha, beta, gamma, n_topics, iterations=1000):
+        filename = "jst" if platform == "linux" else "jst.exe"
+
         subprocess.call(
             [
-                Path(self.model_path) / "jst",
+                Path(self.model_path) / filename,
                 "-est",
                 "-alpha",
                 str(alpha),
@@ -31,5 +34,9 @@ class JST(BaseModel):
                 self.output_dir,
                 "-data_dir",
                 self.input_dir,
+                "-datasetFile",
+                "docs.dat",
+                "-sentiFile",
+                Path(self.input_dir) / "sentiwords.txt",
             ],
         )
