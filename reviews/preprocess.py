@@ -22,8 +22,8 @@ nltk.download("averaged_perceptron_tagger", quiet=True)
 warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
 
 
-with open(data_dir / "stopwords.csv", "r") as f:
-    STOPWORDS = set(f.read().split(","))
+with open(data_dir / "stopwords", "r") as f:
+    STOPWORDS = set([line.strip() for line in f.readlines()])
 
 # STOPWORDS = set(stopwords.words("english"))
 
@@ -134,7 +134,7 @@ def normalize(
         token = ALPHA_RE.sub("", token)
         token = remove_repetitions(token)
 
-        if len(token) > 0:
+        if len(token) > 1:
             if lowercase:
                 token = token.lower()
 
@@ -145,7 +145,7 @@ def normalize(
             if stemming:
                 token = ss.stem(token)
 
-            if token.lower() not in STOPWORDS:
+            if len(token) > 1 and token.lower() not in STOPWORDS:
                 if negs[i]:
                     token = "not_" + token
 
