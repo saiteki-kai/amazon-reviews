@@ -1,12 +1,12 @@
 from dash import html
 
 from dashboard.app import app
-from dashboard.components.item_list import item_list
+from dashboard.layout import layout
 
 app.layout = html.Div(
     id="container",
     className="fluid-container",
-    children=item_list,
+    children=layout,
 )
 
 
