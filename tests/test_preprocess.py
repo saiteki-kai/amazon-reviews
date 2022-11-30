@@ -30,25 +30,6 @@ class TestTextCleaning:
         res = pp.remove_spaces("")
         assert res == ""
 
-    def test_numbers(self):
-        res = pp.remove_numbers("12.5m")
-        assert res == ""
-
-        res = pp.remove_numbers("0,001s")
-        assert res == ""
-
-        res = pp.remove_numbers("250GB")
-        assert res == ""
-
-        res = pp.remove_numbers("30l")
-        assert res == ""
-
-        res = pp.remove_numbers("7")
-        assert res == ""
-
-        res = pp.remove_numbers("23€")
-        assert res == "€"
-
     def test_punctuation(self):
         # commas
 

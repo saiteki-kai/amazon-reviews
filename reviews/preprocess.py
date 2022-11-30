@@ -21,31 +21,39 @@ nltk.download("averaged_perceptron_tagger", quiet=True)
 
 warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
 
-
 with open(data_dir / "stopwords", "r") as f:
     STOPWORDS = set([line.strip() for line in f.readlines()])
 
-# STOPWORDS = set(stopwords.words("english"))
-
 # Regular expressions
 
-URL_RE = re.compile(
-    r"(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})"  # noqa: E501
-)
+URL = r"""
+    (
+        https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}
+        |
+        www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}
+        |
+        https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}
+        |
+        www\.[a-zA-Z\d]+\.\S{2,}
+        |
+        [a-zA-Z\d-]+\.(?:net|com|org|app|edu|int)
+    )
+"""
+
+URL_RE = re.compile(URL, re.VERBOSE)
 
 SPACES_RE = re.compile(" +")
 
 ALPHA_RE = re.compile(r"[^a-zA-Z\s]")
 
-SPLIT_RE = re.compile(r"/+|\\+|\+|-|\.{2,}")
-
-NUM_RE = re.compile(r"(\d*[.,]?\d+(\w+)?)", flags=re.MULTILINE)
-
-DOT_SENT_RE = re.compile(
-    r"([^\d.,\s]{2,})\.((?!com|net|txt)[a-zA-Z]+)", flags=re.MULTILINE
-)
+SPLIT_RE = re.compile(r"/+|\\+|\+|_|-|\.{2,}")
 
 REP_CHAR_RE = re.compile(r"([A-Za-z])\1+", re.DOTALL)
+
+DOT_SENT_RE = re.compile(
+    r"([^\d.,\s]{2,})\.((?!com|net|txt)[a-zA-Z]+)",
+    flags=re.MULTILINE,
+)
 
 WORDNET_TAGS = {
     "N": wordnet.NOUN,
@@ -87,11 +95,6 @@ def remove_non_ascii(text: str):
     )
 
 
-def remove_numbers(text: str):
-    """Remove the numbers with their units of measurement."""
-    return NUM_RE.sub("", text)
-
-
 def fix_punctuation(text: str):
     """Spaces commas and dots."""
     text = text.replace(",", ", ")  # split commas
@@ -100,7 +103,10 @@ def fix_punctuation(text: str):
 
 
 def space_special_chars(text: str):
-    """Replace dashes, slashes, pluses and multiple dots with a space."""
+    """
+    Replace dashes, underscores, slashes, pluses
+    and multiple dots with a space.
+    """
     return SPLIT_RE.sub(" ", text)
 
 
@@ -145,7 +151,7 @@ def normalize(
             if stemming:
                 token = ss.stem(token)
 
-            if len(token) > 1 and token.lower() not in STOPWORDS:
+            if 1 < len(token) < 20 and token.lower() not in STOPWORDS:
                 if negs[i]:
                     token = "not_" + token
 
