@@ -36,6 +36,8 @@ class JST(BaseModel):
                 self.input_dir,
                 "-datasetFile",
                 "docs.dat",
+                "-nsentiLabs",
+                "2",
                 "-sentiFile",
                 Path(self.input_dir) / "sentiwords.txt",
             ],
