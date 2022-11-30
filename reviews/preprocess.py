@@ -154,6 +154,20 @@ def normalize(
     return normalized_tokens
 
 
+def clean_text(text: str):
+    text = remove_urls(text)
+    text = strip_html(text)
+    text = remove_non_ascii(text)
+    text = fix_punctuation(text)
+    text = space_special_chars(text)
+    text = remove_spaces(text)
+
+    # expand contractions
+    text = contractions.fix(text)
+
+    return text
+
+
 def preprocess(
     text,
     lowercase=True,
@@ -162,17 +176,7 @@ def preprocess(
     lemmatization=False,
     return_tokens=True,
 ):
-    # text cleaning
-    text = remove_urls(text)
-    text = strip_html(text)
-    text = remove_spaces(text)
-    text = remove_non_ascii(text)
-    text = remove_numbers(text)
-    text = fix_punctuation(text)
-    text = space_special_chars(text)
-
-    # expand contractions
-    text = contractions.fix(text)
+    text = clean_text(text)
 
     if sentences:
         tokens = [
