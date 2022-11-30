@@ -138,5 +138,5 @@ dmypy.json
 output/
 data/raw
 data/processed
-data/asum/*
-!data/asum/SentiWords-*
+data/asum
+data/jst
