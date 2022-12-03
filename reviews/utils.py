@@ -1,10 +1,11 @@
 import warnings
 from collections import Counter
 from itertools import chain
+from pathlib import Path
 
 import numpy as np
 
-from reviews.preprocess import remove_spaces
+from reviews.preprocess import preprocess, remove_spaces
 
 warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
 
@@ -87,3 +88,53 @@ def remove_tokens_df(df, tokens: set, field="tokens", inplace=False):
         df[field] = res
     else:
         return res
+
+
+def preprocess_df(
+    df,
+    field="text",
+    parallel=True,
+    normalize=None,
+    save=True,
+    out_dir="",
+    verbose=True,
+    inplace=False,
+):
+    args = {}
+
+    if normalize is not None:
+        args[normalize] = True
+
+    if not inplace:
+        df = df.copy()
+
+    if parallel:
+        tokens = df[field].parallel_apply(lambda x: preprocess(x, **args))
+    else:
+        tokens = df[field].apply(lambda x: preprocess(x, **args))
+
+    t1, t2, tokens_to_remove = find_tokens_df(tokens)
+
+    if verbose:
+        print(f"Common: {len(t1)}, Rare: {len(t2)}")
+        print(f"Common: {t1}")
+
+    df["tokens"] = tokens
+
+    remove_tokens_df(df, tokens_to_remove, inplace=True)
+
+    if verbose:
+
+        def find_na(x):
+            if len("".join(chain.from_iterable(x))) > 0:
+                return x
+
+            return None
+
+        empty_docs = df["tokens"].apply(find_na).isna()
+        print(f"Empty Docs: {empty_docs.sum() / len(df) * 100:.2f}%")
+
+    if save and normalize is not None:
+        df.to_json(Path(out_dir) / f"reviews_{field}_{normalize}.json.gz")
+
+    return df
