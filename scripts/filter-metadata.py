@@ -16,7 +16,7 @@ fields_to_remove = {
     "also_view",
     "similar_item",
     "imageURL",
-    "imageURLHighRes",
+    # "imageURLHighRes",
     "details",
     "date",
 }
