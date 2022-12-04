@@ -1,7 +1,8 @@
 from dash import Input, Output, callback, dcc, html
 
 from dashboard.components import navbar
-from dashboard.pages import comparison, details, home
+from dashboard.pages import comparison, details
+from dashboard.pages.home import home
 
 layout = html.Div(
     [

@@ -9,6 +9,5 @@ app.layout = html.Div(
     children=layout,
 )
 
-
 if __name__ == "__main__":
     app.run_server(debug=True)

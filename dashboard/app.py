@@ -1,16 +1,15 @@
 import dash_bootstrap_components as dbc
+import pandas as pd
 from dash import Dash
 
-external_stylesheets = [
-    dbc.themes.BOOTSTRAP,
-    {
-        "href": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css",  # noqa: E501
-        "rel": "stylesheet",
-    },
-]
+from reviews.config import asum_output_dir
+
+external_stylesheets = [dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME]
 
 app = Dash(
     __name__,
     external_stylesheets=external_stylesheets,
     suppress_callback_exceptions=True,
 )
+
+data_df = pd.read_json(asum_output_dir / "reviews_sentiments.json.gz")
