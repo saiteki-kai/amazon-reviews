@@ -38,51 +38,18 @@ def update_reviews_sentiment(brand, category):
         ],
         style={"color": "green"},
     )
-    positive_component = dbc.Col(
-        [
-            html.H3("Positive"),
-            html.Span(
-                [
-                    html.Span(
-                        f"{humanize.intcomma(n_positive)}",
-                        style={"fontSize": "1.5em"},
-                    ),
-                    positive_perc,
-                ],
-            ),
-        ],
-    )
 
     n_negative = n_reviews - n_positive
-    X = (n_negative - old_n_negative) / (n_reviews - n_positive) * 100
     negative_perc = html.Span(
         [
             html.I(className="fa-solid fa-arrow-down mx-1"),
-            f"{X:.0f}%",
+            f"{(n_negative - old_n_negative) / n_negative * 100:.0f}%",
             html.Span(
                 " (from last year)",
                 style={"color": "var(--bs-body-color)"},
             ),
         ],
         style={"color": "red"},
-    )
-
-    negative_component = (
-        dbc.Col(
-            [
-                html.H3("Negative"),
-                html.Span(
-                    [
-                        html.Span(
-                            f"{humanize.intcomma(n_reviews - n_positive)}",
-                            style={"fontSize": "1.5em"},
-                        ),
-                        negative_perc,
-                    ]
-                ),
-            ],
-            style={"textAlign": "right"},
-        ),
     )
 
     return html.Div(
@@ -103,8 +70,35 @@ def update_reviews_sentiment(brand, category):
             ),
             dbc.Row(
                 [
-                    positive_component,
-                    negative_component,
+                    dbc.Col(
+                        [
+                            html.H3("Positive"),
+                            html.Span(
+                                [
+                                    html.Span(
+                                        f"{humanize.intcomma(n_positive)}",
+                                        style={"fontSize": "1.5em"},
+                                    ),
+                                    positive_perc,
+                                ],
+                            ),
+                        ],
+                    ),
+                    dbc.Col(
+                        [
+                            html.H3("Negative"),
+                            html.Span(
+                                [
+                                    html.Span(
+                                        f"{humanize.intcomma(n_negative)}",
+                                        style={"fontSize": "1.5em"},
+                                    ),
+                                    negative_perc,
+                                ]
+                            ),
+                        ],
+                        style={"textAlign": "right"},
+                    ),
                 ],
                 justify="between",
                 class_name="mb-2",
@@ -123,8 +117,7 @@ def update_reviews_sentiment(brand, category):
                                     value=100 - pos_perc,
                                     color="danger",
                                     bar=True,
-                                )
-                                # , label=f"\t{100 - pos_perc:.1f}%"),
+                                ),  # , label=f"\t{100 - pos_perc:.1f}%"),
                             ],
                         ),
                     ),
