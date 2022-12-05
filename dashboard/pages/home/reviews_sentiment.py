@@ -8,6 +8,38 @@ from dashboard.app import data_df
 from dashboard.utils import update_brand
 
 
+def last_year_sentiment(polarity="positive", perc=0):
+    icon = "fa-arrow-down" if perc < 0 else "fa-arrow-up"
+    color = "green" if polarity == "positive" else "red"
+
+    return html.Span(
+        [
+            html.I(className=f"fa-solid {icon} mx-1"),
+            f"{abs(perc):.0f}%",
+            html.Span(
+                " (from last year)",
+                style={"color": "var(--bs-body-color)"},
+            ),
+        ],
+        style={"color": color},
+    )
+
+
+def total_sentiment(polarity="positive", count=0, last_year_perc=0):
+    return [
+        html.H3(polarity.capitalize()),
+        html.Span(
+            [
+                html.Span(
+                    f"{humanize.intcomma(count)}",
+                    style={"fontSize": "1.5em"},
+                ),
+                last_year_sentiment(polarity, perc=last_year_perc),
+            ],
+        ),
+    ]
+
+
 @dash.callback(
     Output("reviews-sentiment", "children"),
     Input("brand-select", "value"),
@@ -19,6 +51,8 @@ def update_reviews_sentiment(brand, category):
 
     n_reviews = len(brand_df)
     n_positive = len(brand_df[brand_df["sentiment"] == "positive"])
+    n_negative = n_reviews - n_positive
+
     last_days = brand_df["timestamp"].max() - np.timedelta64(1, "Y")
 
     old_year_df = brand_df[brand_df["timestamp"] < last_days]
@@ -27,30 +61,8 @@ def update_reviews_sentiment(brand, category):
 
     pos_perc = np.round(n_positive / n_reviews * 100)
 
-    positive_perc = html.Span(
-        [
-            html.I(className="fa-solid fa-arrow-up mx-1"),
-            f"{((n_positive - old_n_positive) / n_positive * 100):.0f}%",
-            html.Span(
-                " (from last year)",
-                style={"color": "var(--bs-body-color)"},
-            ),
-        ],
-        style={"color": "green"},
-    )
-
-    n_negative = n_reviews - n_positive
-    negative_perc = html.Span(
-        [
-            html.I(className="fa-solid fa-arrow-down mx-1"),
-            f"{(n_negative - old_n_negative) / n_negative * 100:.0f}%",
-            html.Span(
-                " (from last year)",
-                style={"color": "var(--bs-body-color)"},
-            ),
-        ],
-        style={"color": "red"},
-    )
+    last_year_pos_perc = int((n_positive - old_n_positive) / n_positive * 100)
+    last_year_neg_perc = int((n_negative - old_n_negative) / n_negative * 100)
 
     return html.Div(
         [
@@ -59,9 +71,7 @@ def update_reviews_sentiment(brand, category):
                     dbc.Col(html.H1("Reviews")),
                     dbc.Col(
                         html.H1(
-                            humanize.intcomma(
-                                n_reviews
-                            ),  # humanize.intword(n_reviews, format="%.0f")
+                            humanize.intcomma(n_reviews),
                             style={"textAlign": "right"},
                         ),
                     ),
@@ -71,32 +81,18 @@ def update_reviews_sentiment(brand, category):
             dbc.Row(
                 [
                     dbc.Col(
-                        [
-                            html.H3("Positive"),
-                            html.Span(
-                                [
-                                    html.Span(
-                                        f"{humanize.intcomma(n_positive)}",
-                                        style={"fontSize": "1.5em"},
-                                    ),
-                                    positive_perc,
-                                ],
-                            ),
-                        ],
+                        total_sentiment(
+                            "positive",
+                            n_positive,
+                            last_year_pos_perc,
+                        ),
                     ),
                     dbc.Col(
-                        [
-                            html.H3("Negative"),
-                            html.Span(
-                                [
-                                    html.Span(
-                                        f"{humanize.intcomma(n_negative)}",
-                                        style={"fontSize": "1.5em"},
-                                    ),
-                                    negative_perc,
-                                ]
-                            ),
-                        ],
+                        total_sentiment(
+                            "negative",
+                            n_negative,
+                            last_year_neg_perc,
+                        ),
                         style={"textAlign": "right"},
                     ),
                 ],

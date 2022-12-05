@@ -18,7 +18,6 @@ from dashboard.utils import update_brand
     Input("category-select", "value"),
 )
 def plot_sentiment_over_time(period, years, brand, category):
-
     # update graph brand
     brand_df = update_brand(data_df, brand, category)
 
@@ -44,7 +43,8 @@ def plot_sentiment_over_time(period, years, brand, category):
         title_text="",
         range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
     )
-    fig.update_yaxes(showgrid=False, title_text="")
+    fig.update_yaxes(showgrid=False, title_text="# Reviews")
+    fig.update_layout({"margin": dict(l=0, r=0, b=0)})
 
     return fig
 
@@ -80,8 +80,14 @@ def update_ranges(period, brand, category):
 
 sentiment_over_time = html.Div(
     [
+        dcc.Graph(id="plot1"),
         dbc.Row(
             [
+                dbc.Col(
+                    dcc.RangeSlider(
+                        1999, 2018, 1, value=[1999, 2018], id="years-slider"
+                    )
+                ),
                 dbc.Col(
                     [
                         dbc.Select(
@@ -94,27 +100,10 @@ sentiment_over_time = html.Div(
                             ],
                             value="Y",
                         ),
-                    ]
+                    ],
+                    width=2,
                 ),
             ]
         ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dcc.Graph(id="plot1"),
-                    ]
-                ),
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    dcc.RangeSlider(
-                        1999, 2018, 1, value=[1999, 2018], id="years-slider"
-                    )
-                ),
-            ]
-        ),
-    ]
+    ],
 )

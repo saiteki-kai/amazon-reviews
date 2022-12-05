@@ -1,28 +1,15 @@
 import dash
 import dash_bootstrap_components as dbc
-from dash import Input, Output, html
+import plotly.express as px
+from dash import Input, Output, dcc, html
 
 import dashboard.pages.home.brand_categories  # noqa:F401
 import dashboard.pages.home.reviews_sentiment  # noqa:F401
 import dashboard.pages.home.star_distribution  # noqa:F401
+import dashboard.pages.home.topics_sentiment  # noqa:F401
+import dashboard.pages.home.word_cloud  # noqa:F401
 from dashboard.app import data_df
 from dashboard.pages.home.sentiment_over_time import sentiment_over_time
-
-# Brand Select
-brand_select = dbc.Select(
-    id="brand-select",
-    options=[
-        {"label": brand, "value": brand}
-        for brand in list(data_df["brand"].value_counts().index)
-    ],
-    value="corsair",
-)
-
-# Brand Categories Select
-category_select = dbc.Select(
-    id="category-select",
-    options=[],
-)
 
 
 @dash.callback(
@@ -46,21 +33,39 @@ layout = html.Div(
         [
             dbc.Row(
                 [
-                    dbc.Col(brand_select, width=4),
-                    dbc.Col(category_select, width=4),
-                ]
+                    dbc.Col(html.H2("Measures"), width=2),
+                    dbc.Col(id="star-distribution", width=2),
+                    dbc.Col(
+                        dcc.Graph(
+                            figure=px.pie(
+                                data_df["sentiment"].value_counts(),
+                                values="sentiment",
+                                names=["positive", "negative"],
+                                hole=0.65,
+                            )
+                        ),
+                        width=2,
+                    ),
+                    dbc.Col(
+                        [
+                            html.Div(id="brand-categories"),
+                            html.Div(id="topics-sentiment"),
+                        ],
+                        width=6,
+                    ),
+                ],
+                id="row1",
             ),
             dbc.Row(
                 [
-                    dbc.Col(id="reviews-sentiment", width=4),
-                    dbc.Col(id="star-distribution", width=4),
+                    dbc.Col(sentiment_over_time, width=6),
+                    dbc.Col(html.Img(id="wordcloud"), width=6),
                 ],
-                justify="between",
+                id="row2",
             ),
-            dbc.Row(dbc.Col(sentiment_over_time, width=6), justify="between"),
-            html.Div(id="brand-categories"),
         ],
         fluid=True,
         className="py-3",
     ),
+    style={"height": "calc(100vh - 56px)"},
 )

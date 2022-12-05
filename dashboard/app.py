@@ -4,7 +4,11 @@ from dash import Dash
 
 from reviews.config import asum_output_dir
 
-external_stylesheets = [dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME]
+external_stylesheets = [
+    dbc.themes.BOOTSTRAP,
+    dbc.icons.FONT_AWESOME,
+    "./assets/style.css",
+]
 
 app = Dash(
     __name__,
@@ -13,3 +17,6 @@ app = Dash(
 )
 
 data_df = pd.read_json(asum_output_dir / "reviews_sentiments.json.gz")
+data_df = data_df[
+    data_df["brand"].isin(list(data_df["brand"].value_counts()[:100].index))
+]

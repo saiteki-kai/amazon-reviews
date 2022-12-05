@@ -35,29 +35,39 @@ def update_brand_categories(brand, category):
     )
 
     order = dict(category=list(brand_df["category"].value_counts().index))
+
+    fig1 = px.bar(
+        category_count_df,
+        x="count",
+        y="category",
+        category_orders=order,
+    )
+    fig1.update_xaxes(showgrid=False, title_text="")
+    fig1.update_yaxes(showgrid=False, title_text="")
+    fig1.update_layout(margin=dict(l=0, t=0, r=0, b=0))
+
+    fig2 = px.bar(
+        sentiments_df_perc,
+        x="count",
+        y="category",
+        color="sentiment",
+        barmode="relative",
+        category_orders=order,
+    )
+    fig2.update_xaxes(showgrid=False, title_text="")
+    fig2.update_yaxes(showgrid=False, title_text="", showticklabels=False)
+    fig2.update_layout(margin=dict(l=0, t=0, r=0, b=0))
+
     return dbc.Row(
         [
             dbc.Col(
-                dcc.Graph(
-                    figure=px.bar(
-                        category_count_df,
-                        x="count",
-                        y="category",
-                        category_orders=order,
+                dbc.Row(
+                    dcc.Graph(
+                        figure=fig1,
                     )
-                )
+                ),
             ),
-            dbc.Col(
-                dcc.Graph(
-                    figure=px.bar(
-                        sentiments_df_perc,
-                        x="count",
-                        y="category",
-                        color="sentiment",
-                        barmode="relative",
-                        category_orders=order,
-                    )
-                )
-            ),
-        ]
+            dbc.Col(dcc.Graph(figure=fig2)),
+        ],
+        id="row3",
     )

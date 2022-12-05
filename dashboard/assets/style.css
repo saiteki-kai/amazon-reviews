@@ -3,10 +3,6 @@ body {
   padding: 0;
 }
 
-.row {
-  --bs-gutter-x: 0;
-}
-
 .bi {
   padding-right: 2px;
 }
@@ -57,7 +53,7 @@ body {
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed; 
-  margin: 0px;
+  margin: 0;
 }
 
 #item-list thead {
@@ -95,4 +91,67 @@ body {
 ::-webkit-scrollbar-track {
   margin-block-start: 36px;
   background-color: #20202000;
+}
+
+.container-fluid {
+  height: 100%;
+}
+
+#row1, #row2 {
+  height: 50%;
+}
+
+#row3{
+  height: 100%
+}
+
+.plot-container, .svg-container, .svg-container > svg {
+  height: 100% !important;
+}
+
+#row1 > div, #row1 > div > div {
+  height: 100%;
+}
+
+#row2 > div, #row2 > div > div {
+  height: 100%;
+}
+
+#row3 > div, #row3 > div > div {
+  height: 100%;
+}
+
+#plot1 {
+  height: 90%;
+}
+
+/* DEBUG */
+*[class^='col-'], .col {
+  border: black solid 1px;
+}
+
+#wordcloud {
+  height: 100%;
+  width: auto;
+  display: flex;
+  margin: auto;
+}
+
+.row {
+  --bs-gutter-y: 0;
+  --bs-gutter-x: 0;
+}
+
+#brand-categories, #topics-sentiment {
+  height: 50% !important;
+}
+
+.select-container {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+}
+
+.select-container > span {
+  margin: 8px;
 }
