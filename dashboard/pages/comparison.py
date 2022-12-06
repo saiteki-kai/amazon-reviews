@@ -1,63 +1,148 @@
+import datetime
 import dash_bootstrap_components as dbc
 from dash import Input, Output, callback, dcc, html
 from reviews.config import processed_data_dir
 import pandas as pd
+import plotly.express as px
 
 layout = html.Div(
     [
         dbc.Container(
             [
-                html.H1("Comparison"),
+                dbc.Row([
+                    dbc.Col([
+                        dcc.Graph(id = "global_sentiment")
+                    ]),
+                    dbc.Col([
+                        dcc.Graph(id = "topic_sentiment")
+                    ]),
+                ],id = "row4",),
+                dbc.Row([
+                    dbc.Col([
+                        dcc.Graph(id = "time_brand_pos_sentiment")
+                    ]),
+                    dbc.Col([
+                        dcc.Graph(id = "time_brand_neg_sentiment")
+                    ]),
+                ],id = "row5",),
             ],
+            fluid=True,
             className="py-3",
-        ),   
-        dbc.Row([   
-            dbc.Row([
-                dbc.Row(
-                    dbc.Col(html.Div(
-                        dcc.Dropdown(['Brand', 'Product', 'Sub-category'], placeholder='Select kind of comparison . . . ', id='dropdown_down_comparison')
-                    )),
-                ),
-                dbc.Row([
-                    dbc.Col(html.Div(
-                        dcc.Dropdown(['NYC', 'MTL', 'SF'], placeholder='Select your kind', id='dropdown_left')
-                    )),
-                    dbc.Col(html.Div(
-                        dcc.Dropdown(['NYC', 'MTL', 'SF'], placeholder='Select your kind', id='dropdown_right')
-                    )),
-                ]),
-            ]),
-            dbc.Row([ 
-                dbc.Row([
-                    dbc.Col(html.Div("prima linea grafici,primo grafico")),
-                    dbc.Col(html.Div("prima linea grafici,secondo grafico")),
-                    dbc.Col(html.Div("prima linea grafici,terzo grafico")),
-                ]),
-                dbc.Row([
-                    dbc.Col(html.Div("seconda linea grafici, primo grafico")),
-                    dbc.Col(html.Div("seconda linea grafici, secondo grafico")),
-                ]),
-            ]),
-        ])
-    ]
+        )
+    ],
+    className="page-container",
 )
 
 # function for dynamic dash page -----------------------------------------------
 #variable
-data_df = pd.read_json(processed_data_dir / "products_reviews.json.gz")
+from dashboard.app import data_df
+from dashboard.utils import update_brand
+import dash
 
-# dynamic set placeholder for dropdown left and right
-@callback([Output('dropdown_left', "placeholder"), Output('dropdown_right', "placeholder")], [Input('dropdown_down_comparison', 'value')])
-def drop_down_placeholder_kind_comparison(value):
-    if(str(value) == "None"):
-        return "Select your kind of comparison", "Select your kind of comparison"
-    else:
-        return "Select your " + str(value), "Select your " + str(value),
+@dash.callback(
+    Output("global_sentiment", "figure"),
+    Output("time_brand_pos_sentiment", "figure"),
+    Output("time_brand_neg_sentiment", "figure"),
+    Output("topic_sentiment", "figure"),
+    Input("brand-select", "value"),
+    Input("category-select", "value"),
+)
 
-# dynamic set value for dropdown left and right 
-@callback([Output('dropdown_left', "options"), Output('dropdown_right', "options")],[Input('dropdown_down_comparison', 'value')])
-def drop_down_value(value):
-    if(str(value) == "None"):
-        return [],[]
-    else:
-        return data_df["brand"].to_dict() , ["valori"]
+def update_plot(brand, category):
+    if(category == "All"):
+        dash.no_update
+
+    # update graph brand
+    brand_df = update_brand(data_df, brand, category)
+
+    category_df = data_df[data_df["category"] == category]
+    category_df = category_df[category_df["brand"] != brand]
+
+    # competitors
+    competitors = list(category_df["brand"].value_counts().index)[:5] + [brand]
+
+    competitors_df = data_df[data_df["brand"].isin(competitors)]
+    
+    # gloabl sentiment 
+    sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
+    sentiment_df_perc = (
+        sentiment_df / sentiment_df.groupby("brand").sum() * 100
+    )    
+    sentiment_df_perc = (
+        pd.DataFrame(sentiment_df_perc)
+        .rename(columns={"sentiment": "count"})
+        .reset_index()
+    )
+    
+    fig2 = px.bar(
+        sentiment_df_perc,
+        x="brand",
+        y="count",
+        color="sentiment",
+        barmode="relative",
+        category_orders=dict(brand = [brand, *competitors]),
+    )
+    fig2.update_xaxes(showgrid=False, title_text="")
+    fig2.update_yaxes(showgrid=False, title_text="", showticklabels=False)
+    fig2.update_layout(margin=dict(l=0, t=0, r=0, b=0))
+
+    # positive sentiment in time
+    sentiments_count = competitors_df[competitors_df["sentiment"] == "positive"].groupby(["timestamp", "brand"])["sentiment"].value_counts()
+    sentiments_df = (
+        pd.DataFrame(sentiments_count)
+        .rename(columns={"sentiment": "count"})
+        .reset_index()
+    )
+
+    fig3 = px.line(
+        sentiments_df,
+        x="timestamp",
+        y="count",
+        color="brand",
+        #title="Sentiment Over Time",
+    )
+    fig3.update_xaxes(
+        showgrid=False,
+        title_text="",
+        # range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
+    )
+    fig3.update_yaxes(showgrid=False, title_text="# Reviews")
+    fig3.update_layout({"margin": dict(l=0, r=0, b=0)})
+
+    # negative sentiment in time 
+    sentiments_count = competitors_df[competitors_df["sentiment"] == "negative"].groupby(["timestamp", "brand"])["sentiment"].value_counts()
+    sentiments_df = (
+        pd.DataFrame(sentiments_count)
+        .rename(columns={"sentiment": "count"})
+        .reset_index()
+    )
+
+    fig4 = px.line(
+        sentiments_df,
+        x="timestamp",
+        y="count",
+        color="brand",
+        #title="Sentiment Over Time",
+    )
+    fig4.update_xaxes(
+        showgrid=False,
+        title_text="",
+        # range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
+    )
+    fig4.update_yaxes(showgrid=False, title_text="# Reviews")
+    fig4.update_layout({"margin": dict(l=0, r=0, b=0)})
+
+    # sentimenti for topic
+    fig2 = px.bar(
+        sentiment_df_perc,
+        x="brand",
+        y="count",
+        color="sentiment",
+        barmode="relative",
+        category_orders=dict(brand = [brand, *competitors]),
+    )
+    fig2.update_xaxes(showgrid=False, title_text="")
+    fig2.update_yaxes(showgrid=False, title_text="", showticklabels=False)
+    fig2.update_layout(margin=dict(l=0, t=0, r=0, b=0))
+
+    return fig2, fig3, fig4, fig5

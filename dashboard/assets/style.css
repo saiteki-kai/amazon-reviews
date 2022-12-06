@@ -97,7 +97,7 @@ body {
   height: 100%;
 }
 
-#row1, #row2 {
+#row1, #row2, #row4, #row5 {
   height: 50%;
 }
 
@@ -118,6 +118,14 @@ body {
 }
 
 #row3 > div, #row3 > div > div {
+  height: 100%;
+}
+
+#row4 > div, #row4 > div > div {
+  height: 100%;
+}
+
+#row5 > div, #row5 > div > div {
   height: 100%;
 }
 
@@ -154,4 +162,8 @@ body {
 
 .select-container > span {
   margin: 8px;
+}
+
+.page-container {
+  height: calc(100vh - 56px);
 }

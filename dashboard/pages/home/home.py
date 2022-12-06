@@ -67,5 +67,5 @@ layout = html.Div(
         fluid=True,
         className="py-3",
     ),
-    style={"height": "calc(100vh - 56px)"},
+    className="page-container", 
 )
