@@ -14,6 +14,11 @@ layout = html.Div(
                         dcc.Graph(id = "global_sentiment")
                     ]),
                     dbc.Col([
+                        dcc.Dropdown(id = "topic_dropdown",
+                            placeholder = "select topic",
+                            value = 'Gold',
+                            clearable = False,
+                    ),
                         dcc.Graph(id = "topic_sentiment")
                     ]),
                 ],id = "row4",),
@@ -34,7 +39,6 @@ layout = html.Div(
 )
 
 # function for dynamic dash page -----------------------------------------------
-#variable
 from dashboard.app import data_df
 from dashboard.utils import update_brand
 import dash
@@ -133,7 +137,7 @@ def update_plot(brand, category):
     fig4.update_layout({"margin": dict(l=0, r=0, b=0)})
 
     # sentimenti for topic
-    fig2 = px.bar(
+    fig5 = px.bar(
         sentiment_df_perc,
         x="brand",
         y="count",
@@ -141,8 +145,8 @@ def update_plot(brand, category):
         barmode="relative",
         category_orders=dict(brand = [brand, *competitors]),
     )
-    fig2.update_xaxes(showgrid=False, title_text="")
-    fig2.update_yaxes(showgrid=False, title_text="", showticklabels=False)
-    fig2.update_layout(margin=dict(l=0, t=0, r=0, b=0))
+    fig5.update_xaxes(showgrid=False, title_text="")
+    fig5.update_yaxes(showgrid=False, title_text="", showticklabels=False)
+    fig5.update_layout(margin=dict(l=0, t=0, r=0, b=0))
 
     return fig2, fig3, fig4, fig5
