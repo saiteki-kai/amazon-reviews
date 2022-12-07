@@ -119,5 +119,5 @@ def update_reviews_sentiment(brand, category):
                     ),
                 ]
             ),
-        ]
+        ],
     )

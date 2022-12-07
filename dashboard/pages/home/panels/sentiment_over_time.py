@@ -11,7 +11,7 @@ from dashboard.utils import update_brand
 
 
 @dash.callback(
-    Output("plot1", "figure"),
+    Output("sentiment-over-time", "figure"),
     Input("period", "value"),
     Input("years-slider", "value"),
     Input("brand-select", "value"),
@@ -44,7 +44,7 @@ def plot_sentiment_over_time(period, years, brand, category):
         range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
     )
     fig.update_yaxes(showgrid=False, title_text="# Reviews")
-    fig.update_layout({"margin": dict(l=0, r=0, b=0)})
+    fig.update_layout(margin=dict(l=0, r=0, b=0))
 
     return fig
 
@@ -78,9 +78,9 @@ def update_ranges(period, brand, category):
     )
 
 
-sentiment_over_time = html.Div(
+panel = html.Div(
     [
-        dcc.Graph(id="plot1"),
+        dcc.Graph(id="sentiment-over-time"),
         dbc.Row(
             [
                 dbc.Col(
@@ -106,4 +106,5 @@ sentiment_over_time = html.Div(
             ]
         ),
     ],
+    className="panel",
 )

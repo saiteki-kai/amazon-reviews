@@ -4,18 +4,19 @@ import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
-from dash import Input, Output, dcc
+from dash import Input, Output, dcc, html
 
 from dashboard.app import data_df
 from dashboard.utils import update_brand
 
 
 @dash.callback(
-    Output("topics-sentiment", "children"),
+    Output("topics-distribution", "figure"),
+    Output("topics-distribution-perc", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
 )
-def update_brand_categories(brand, category):
+def update_topics_sentiment(brand, category):
     # update graph brand
     brand_df = update_brand(data_df, brand, category)
 
@@ -82,16 +83,22 @@ def update_brand_categories(brand, category):
     fig2.update_yaxes(showgrid=False, title_text="")
     fig2.update_layout({"margin": dict(l=0, t=0, r=0, b=0)})
 
-    return dbc.Row(
+    return fig1, fig2
+
+
+panel = html.Div(
+    dbc.Row(
         [
             dbc.Col(
-                dbc.Row(
-                    dcc.Graph(
-                        figure=fig1,
-                    )
-                ),
+                dcc.Graph(id="topics-distribution"),
+                className="h-100",
             ),
-            dbc.Col(dcc.Graph(figure=fig2)),
+            dbc.Col(
+                dcc.Graph(id="topics-distribution-perc"),
+                className="h-100",
+            ),
         ],
-        id="row3",
-    )
+        className="h-100",
+    ),
+    className="panel",
+)

@@ -45,7 +45,6 @@ def star_row(df, n):
                 ),
             ),
         ],
-        className="mb-2",
     )
 
 
@@ -57,9 +56,14 @@ def star_row(df, n):
 def star_distribution(brand, category):
     # update graph brand
     brand_df = update_brand(data_df, brand, category)
-    return html.Div(
-        [
-            html.H4("Star Distribution"),
-            *[star_row(brand_df, i) for i in range(5, 0, -1)],
-        ]
-    )
+
+    return [star_row(brand_df, i) for i in range(5, 0, -1)]
+
+
+panel = html.Div(
+    [
+        html.H4("Star Distribution"),
+        html.Div(id="star-distribution"),
+    ],
+    className="panel",
+)

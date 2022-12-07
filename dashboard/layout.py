@@ -8,7 +8,7 @@ layout = html.Div(
     [
         dcc.Location(id="url"),
         navbar.layout,
-        html.Div(id="page-content", style={"height": "calc(100vh - 56px)"}),
+        html.Div(id="page-content"),
     ]
 )
 

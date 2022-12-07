@@ -1,15 +1,16 @@
 import dash
 import dash_bootstrap_components as dbc
-import plotly.express as px
-from dash import Input, Output, dcc, html
+from dash import Input, Output, html
 
-import dashboard.pages.home.brand_categories  # noqa:F401
-import dashboard.pages.home.reviews_sentiment  # noqa:F401
-import dashboard.pages.home.star_distribution  # noqa:F401
-import dashboard.pages.home.topics_sentiment  # noqa:F401
-import dashboard.pages.home.word_cloud  # noqa:F401
 from dashboard.app import data_df
-from dashboard.pages.home.sentiment_over_time import sentiment_over_time
+from dashboard.pages.home.panels import (
+    brand_categories,
+    measures,
+    sentiment_over_time,
+    star_distribution,
+    topics_sentiment,
+    word_cloud,
+)
 
 
 @dash.callback(
@@ -29,43 +30,65 @@ def update_categories(brand):
 
 
 layout = html.Div(
-    dbc.Container(
+    dbc.Row(
         [
-            dbc.Row(
+            dbc.Col(
                 [
-                    dbc.Col(html.H2("Measures"), width=2),
-                    dbc.Col(id="star-distribution", width=2),
-                    dbc.Col(
-                        dcc.Graph(
-                            figure=px.pie(
-                                data_df["sentiment"].value_counts(),
-                                values="sentiment",
-                                names=["positive", "negative"],
-                                hole=0.65,
-                            )
-                        ),
-                        width=2,
-                    ),
-                    dbc.Col(
+                    dbc.Row(
                         [
-                            html.Div(id="brand-categories"),
-                            html.Div(id="topics-sentiment"),
+                            dbc.Col(
+                                measures.panel,
+                                className="h-100",
+                            ),
+                            dbc.Col(
+                                star_distribution.panel,
+                                className="h-100",
+                            ),
                         ],
-                        width=6,
+                        id="row1",
+                        className="g-0",
+                    ),
+                    dbc.Row(
+                        dbc.Col(sentiment_over_time.panel, className="h-100"),
+                        id="row2",
+                        className="g-0",
                     ),
                 ],
-                id="row1",
+                width=6,
+                className="h-100",
             ),
-            dbc.Row(
+            dbc.Col(
                 [
-                    dbc.Col(sentiment_over_time, width=6),
-                    dbc.Col(html.Img(id="wordcloud"), width=6),
+                    dbc.Row(
+                        dbc.Col(
+                            brand_categories.panel,
+                            className="h-100",
+                        ),
+                        id="row3",
+                        className="g-0",
+                    ),
+                    dbc.Row(
+                        dbc.Col(
+                            topics_sentiment.panel,
+                            className="h-100",
+                        ),
+                        id="row4",
+                        className="g-0",
+                    ),
+                    dbc.Row(
+                        dbc.Col(
+                            word_cloud.panel,
+                            className="h-100",
+                        ),
+                        id="row5",
+                        className="g-0",
+                    ),
                 ],
-                id="row2",
+                width=6,
+                className="h-100",
             ),
         ],
-        fluid=True,
-        className="py-3",
+        className="h-100 g-0",
     ),
-    className="page-container", 
+    className="page-container",
 )
