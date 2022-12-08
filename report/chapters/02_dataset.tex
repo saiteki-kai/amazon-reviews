@@ -1,1 +1,38 @@
-\chapter{Dataset}
+\section{Dataset}
+Il dataset utilizzato in questo lavoro contiene i prodotti e le recensioni della sottocategoria \textit{Internal Computer Components} di Amazon dal 1999 fino al 2018.
+
+Nella tabella X sono descritte le caratteristiche del dataset. % TODO: sistemare (attrs, avg reviews per product)
+
+% TODO: aggiungere
+Per prima cosa è stata effettuata una pulizia dei dati per alcuni attributi.
+%
+Brand Cleaning
+
+Sono stati identificati i valori mancati e i valori duplicati di prodotti e recensioni. 
+Infine sono stati tenute solo i prodotti che hanno almeno una recensione associata.
+
+Nella figura \ref{fig:missing_values} sono riportate le percentuali di valori mancanti. Le uniche recensioni che sono state 
+scartate sono quelle con testo vuoto che sono solo 2.
+
+% TODO: aggiungere numero duplicati
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\textwidth]{images/dataset/missing_values.png}
+  \caption{Percentuale dei valori mancanti per ogni attributo.}
+  \label{fig:missing_values}
+\end{figure}
+
+Tramite il modello FastText \cite{joulin2016bag} sono state identificate e tenute 
+solo le recensioni in lingua inglese con probabilità superiore o uguale al 95\%.
+
+% TODO: riscrivere meglio
+In input sono stati passati al modello i campi \textit{summary} e \textit{text} concatenati tra loro e su questo nuovo 
+campo sono stati rimossi gli URL e i tag HTML e infine trasformato in minuscolo.
+
+Il numero di recensioni rimanenti è 183,856 che corrisponde al 68\% del dataset.
+
+% TODO: controllare cbe siano giusti data l'analisi divisa tra prodotti e reviews...
+
+\subsection{Analisi}
+Successivamente è stata effettuata un'analisi esplorativa del dataset pulito.

@@ -1,10 +1,8 @@
-\documentclass[titlepage]{report}
+\documentclass[titlepage]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[OT1]{fontenc}
 \usepackage{cmbright}
 \usepackage{amsmath}
-\usepackage{fancyhdr}
-\usepackage{parskip}
 \usepackage{amssymb}
 \usepackage{tikz}
 \usepackage{subcaption}
@@ -16,17 +14,6 @@
 
 \title{Data Analytics}
 \date{2021 - 2022}
-
-% fancyhdr ----------------------------
-
-\pagestyle{fancy}
-\setlength{\headheight}{13pt}
-\cfoot{\thepage}
-\lhead{}
-\rhead{\leftmark}
-
-\renewcommand{\headrulewidth}{0.1pt}
-\renewcommand{\footrulewidth}{0pt}
 
 % document ----------------------------
 
@@ -42,7 +29,6 @@
 
 \clearpage
 \pagenumbering{arabic}
-
 
 \include{chapters/01_introduction}
 \include{chapters/02_dataset}
