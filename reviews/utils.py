@@ -1,3 +1,4 @@
+import json
 import warnings
 from collections import Counter
 from itertools import chain
@@ -5,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
+from reviews.config import data_dir
 from reviews.preprocess import preprocess, remove_spaces
 
 warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
@@ -44,6 +46,25 @@ def clean_brand(x):
         return np.nan
 
     return x
+
+
+def read_sentiment_words(normalization=None):
+    """
+    Return positive and negative sentiment words
+    based on the normalization.
+    """
+    with open(data_dir / "sentiwords.json", "r") as f:
+        senti_words = json.load(f)
+
+        if normalization not in {"stemming", "lemmatization"}:
+            normalization = "raw"
+
+        normalized = senti_words[normalization]
+
+        pos_words = normalized["positive"]
+        neg_words = normalized["negative"]
+
+        return pos_words, neg_words
 
 
 def flat_sentence_tokens(tokens):
