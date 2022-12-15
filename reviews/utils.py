@@ -4,8 +4,6 @@ from collections import Counter
 from itertools import chain
 from pathlib import Path
 
-import numpy as np
-
 from reviews.config import data_dir
 from reviews.preprocess import preprocess, remove_spaces
 
@@ -26,7 +24,7 @@ COMMON_BRAND_TERMS = {
 
 def clean_brand(x):
     if type(x) is not str:
-        return np.nan
+        return "unknown"
 
     x = x.lower()
     x = (
@@ -43,7 +41,7 @@ def clean_brand(x):
     x = " ".join([t for t in x.split(" ") if t not in COMMON_BRAND_TERMS])
 
     if len(x) <= 1 or "Top Ten" in x or len(x.split(" ")) > 7:
-        return np.nan
+        return "unknown"
 
     return x
 
@@ -71,21 +69,42 @@ def flat_sentence_tokens(tokens):
     return [token for row in tokens for sent in row for token in sent]
 
 
-def find_tokens_df(tokens_list):
+def find_tokens_df(
+    tokens_list,
+    normalization=None,
+    t1=0.9,
+    t2=4,
+    verbose=False,
+):
     """
     Find tokens with a document frequency greater
-    than 90% or less than 4.
+    than t1 or less than t2. Default values are
+    0.9 and 4.
     """
-
     word_freq = [Counter(chain.from_iterable(d)) for d in list(tokens_list)]
 
     doc_freq = Counter()
     for wf in word_freq:
         doc_freq.update(list(wf.keys()))
 
-    common = [w for w, freq in doc_freq.items() if freq / len(doc_freq) > 0.9]
+    pos_words, neg_words = read_sentiment_words(normalization)
+    seeds = set(pos_words + neg_words)
 
-    rare = [w for w, freq in doc_freq.items() if freq < 4]
+    rare = [w for w, freq in doc_freq.items() if freq < t2]
+    r1 = len(set(rare))
+
+    rare = [w for w in rare if w not in seeds]  # exclude seed words
+    r2 = r1 - len(set(rare))
+
+    common = [w for w, freq in doc_freq.items() if freq / len(doc_freq) > t1]
+    c1 = len(set(common))
+
+    common = [w for w in common if w not in seeds]  # exclude seed words
+    c2 = c1 - len(set(common))
+
+    if verbose:
+        print(f"{r1} rare words found of which {r2} are seeds.")
+        print(f"{c1} common words found of which {c2} are seeds.")
 
     return set(common), set(rare), set(common + rare)
 
@@ -120,6 +139,7 @@ def preprocess_df(
     out_dir="",
     verbose=True,
     inplace=False,
+    **tokens_args,
 ):
     args = {}
 
@@ -134,15 +154,22 @@ def preprocess_df(
     else:
         tokens = df[field].apply(lambda x: preprocess(x, **args))
 
-    t1, t2, tokens_to_remove = find_tokens_df(tokens)
+    if "skip" not in tokens_args or not tokens_args["skip"]:
+        tokens_args["verbose"] = verbose
+        t1, _, tokens_to_remove = find_tokens_df(
+            tokens,
+            normalize,
+            **tokens_args,
+        )
 
-    if verbose:
-        print(f"Common: {len(t1)}, Rare: {len(t2)}")
-        print(f"Common: {t1}")
+        if verbose:
+            print(f"Common: {t1}")
 
-    df["tokens"] = tokens
+        df["tokens"] = tokens
 
-    remove_tokens_df(df, tokens_to_remove, inplace=True)
+        remove_tokens_df(df, tokens_to_remove, inplace=True)
+    else:
+        df["tokens"] = tokens
 
     if verbose:
 
