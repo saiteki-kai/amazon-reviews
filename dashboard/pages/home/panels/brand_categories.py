@@ -41,6 +41,7 @@ def update_brand_categories(brand, category):
         category_count_df,
         x="count",
         y="category",
+        color_discrete_sequence=["#108de4"],
         category_orders=order,
     )
     fig1.update_xaxes(showgrid=False, title_text="")
@@ -52,6 +53,7 @@ def update_brand_categories(brand, category):
         x="count",
         y="category",
         color="sentiment",
+        color_discrete_sequence=["#f54242", "#27d957"],
         barmode="relative",
         category_orders=order,
     )

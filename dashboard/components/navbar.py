@@ -31,16 +31,19 @@ layout = dbc.Navbar(
                                 "Home",
                                 href="/",
                                 active="exact",
+                                className="navbar-dark",
                             ),
                             dbc.NavLink(
                                 "Products",
                                 href="/details",
                                 active="exact",
+                                className="navbar-dark",
                             ),
                             dbc.NavLink(
                                 "Comparison",
                                 href="/comparison",
                                 active="exact",
+                                className="navbar-dark",
                             ),
                         ],
                     ),
@@ -73,4 +76,6 @@ layout = dbc.Navbar(
         ),
         fluid=True,
     ),
+    dark=True,
+    color="primary",
 )

@@ -32,8 +32,13 @@ def update_word_cloud(brand, category):
 
     c = Counter(x)
 
+    # mask = np.array(Image.open("~/Downloads/accessori-featured.jpg"))
+    # mask = mask, contour_width = 3, contour_color = 'steelblue'
+
     img = io.BytesIO()
-    w = WordCloud(width=800, height=400, background_color="white").fit_words(c)
+    w = WordCloud(
+        width=2400, height=800, background_color="black", colormap="Blues"
+    ).fit_words(c)
     w.to_image().save(img, format="PNG")
 
     img_base64 = base64.b64encode(img.getvalue()).decode()

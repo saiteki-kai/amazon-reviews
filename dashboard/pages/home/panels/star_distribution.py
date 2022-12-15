@@ -39,7 +39,7 @@ def star_row(df, n):
                 dbc.Col(
                     dbc.Progress(
                         value=np.round(overall_perc),
-                        color="gray",
+                        color="#108de4",
                         style={"height": "8px"},
                     ),
                 ),

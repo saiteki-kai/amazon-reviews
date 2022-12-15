@@ -36,6 +36,7 @@ def plot_sentiment_over_time(period, years, brand, category):
         x=period,
         y="count",
         color="sentiment",
+        color_discrete_sequence=["#f54242", "#27d957"],
         title="Sentiment Over Time",
     )
     fig.update_xaxes(
