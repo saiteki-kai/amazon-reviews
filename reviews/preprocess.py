@@ -126,6 +126,7 @@ def normalize(
     lowercase=True,
     lemmatization=True,
     stemming=False,
+    remove_stopwords=True,
 ):
     if lemmatization and stemming:
         raise ValueError(
@@ -140,22 +141,31 @@ def normalize(
         token = ALPHA_RE.sub("", token)
         token = remove_repetitions(token)
 
-        if len(token) > 1:
-            if lowercase:
-                token = token.lower()
+        # skip words shorter than 2 characters
+        # and stopwords if remove_stopwords = True
+        stopwords_condition = remove_stopwords and token.lower() in STOPWORDS
+        if len(token) < 2 or stopwords_condition:
+            continue
 
-            if lemmatization:
-                pos = tags[i]
-                token = wnl.lemmatize(token, pos)
+        if lowercase:
+            token = token.lower()
 
-            if stemming:
-                token = ss.stem(token)
+        if lemmatization:
+            pos = tags[i]
+            token = wnl.lemmatize(token, pos)
 
-            if 1 < len(token) < 20 and token.lower() not in STOPWORDS:
-                if negs[i]:
-                    token = "not_" + token
+        if stemming:
+            token = ss.stem(token)
 
-                normalized_tokens.append(token)
+        # skip stopwords if remove_stopwords = True
+        if remove_stopwords and token.lower() in STOPWORDS:
+            continue
+
+        if 1 < len(token) < 20:
+            if negs[i]:
+                token = "not_" + token
+
+            normalized_tokens.append(token)
 
     return normalized_tokens
 
@@ -180,6 +190,7 @@ def preprocess(
     sentences=True,
     stemming=False,
     lemmatization=False,
+    remove_stopwords=True,
     return_tokens=True,
 ):
     text = clean_text(text)
@@ -209,6 +220,7 @@ def preprocess(
                     lowercase=lowercase,
                     lemmatization=lemmatization,
                     stemming=stemming,
+                    remove_stopwords=remove_stopwords,
                 )
 
                 if len(normalized_tokens) > 0:
@@ -222,6 +234,7 @@ def preprocess(
                     lowercase=lowercase,
                     lemmatization=lemmatization,
                     stemming=stemming,
+                    remove_stopwords=remove_stopwords,
                 )
                 if len(normalized_tokens) > 0:
                     sent_tokens.append(normalized_tokens)
@@ -243,6 +256,7 @@ def preprocess(
         lowercase=lowercase,
         lemmatization=lemmatization,
         stemming=stemming,
+        remove_stopwords=remove_stopwords,
     )
 
     if return_tokens:

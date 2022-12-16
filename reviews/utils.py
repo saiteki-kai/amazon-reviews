@@ -135,6 +135,7 @@ def preprocess_df(
     field="text",
     parallel=True,
     normalize=None,
+    remove_stopwords=None,
     save=True,
     out_dir="",
     verbose=True,
@@ -145,6 +146,9 @@ def preprocess_df(
 
     if normalize is not None:
         args[normalize] = True
+
+    if remove_stopwords is not None:
+        args["remove_stopwords"] = remove_stopwords
 
     if not inplace:
         df = df.copy()
