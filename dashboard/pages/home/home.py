@@ -17,12 +17,16 @@ from dashboard.pages.home.panels import (
     Output("category-select", "options"),
     Output("category-select", "value"),
     Input("brand-select", "value"),
+    Input("url", "pathname"),
 )
-def update_categories(brand):
+def update_categories(brand, pathname):
     df = data_df[data_df["brand"] == brand]
 
     categories = list(df["category"].value_counts().index)
     options = [{"label": c, "value": c} for c in categories]
+
+    if pathname == "/comparison":
+        return options, options[0]["value"]
 
     options = [{"label": "All", "value": "All"}] + options
 

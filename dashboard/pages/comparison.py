@@ -1,3 +1,4 @@
+from collections import Counter
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -22,6 +23,7 @@ layout = html.Div(
                         [
                             dcc.Dropdown(
                                 id="topic_dropdown",
+                                options = [""],
                                 placeholder="select topic",
                                 value="Gold",
                                 clearable=False,
@@ -60,9 +62,14 @@ layout = html.Div(
     className="page-container",
 )
 
-
-# from dashboard.utils import update_brand
-
+@dash.callback(
+    Output("topic_dropdown", "options"),
+    Output("topic_dropdown", "value"),
+    Input("category-select", "value"),
+)
+def update_category(category):
+    opt = [{"label": f"T{i}", "value": f"T{i}"} for i in range(0,10)]
+    return opt, opt[0]["value"]
 
 @dash.callback(
     Output("global_sentiment", "figure"),
@@ -71,14 +78,9 @@ layout = html.Div(
     Output("topic_sentiment", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("topic_dropdown", "value"),
 )
-def update_plot(brand, category):
-    if category == "All":
-        return dash.no_update
-
-    # update graph brand
-    # brand_df = update_brand(data_df, brand, category)
-
+def update_plot(brand, category, topic):
     category_df = data_df[data_df["category"] == category]
     category_df = category_df[category_df["brand"] != brand]
 
@@ -163,8 +165,47 @@ def update_plot(brand, category):
     fig4.update_layout({"margin": dict(l=0, r=0, b=0)})
 
     # sentimenti for topic
+    total_df = pd.DataFrame()
+
+    for brand in competitors:
+        pos_count = Counter()
+        neg_count = Counter()
+
+        brand_df = competitors_df[competitors_df["brand"] == brand]
+        for t in brand_df["topics"].values:
+            pos_topics = set([f"T{s['topic']}" for s in t if s["sentiment"] == 0])
+            neg_topics = set([f"T{s['topic']}" for s in t if s["sentiment"] == 1])
+
+            pos_count.update(pos_topics)
+            neg_count.update(neg_topics)
+
+        pos_df = pd.DataFrame(pos_count.items(), columns=["topic", "pos"])
+        neg_df = pd.DataFrame(neg_count.items(), columns=["topic", "neg"])
+
+        st_counts = pd.merge(pos_df, neg_df, on="topic")
+        st_counts["topic"] = st_counts["topic"].astype("category")
+
+        total = st_counts["pos"] + st_counts["neg"]
+        st_counts["pos"] = st_counts["pos"] / total * 100
+        st_counts["neg"] = st_counts["neg"] / total * 100
+
+        st_counts.set_index("topic", inplace=True)
+        st_counts.sort_index(inplace=True)
+
+        df_senti = (
+            st_counts.stack(level=0)
+            .reset_index()
+            .rename(columns={"level_1": "sentiment", 0: "count"})
+        )
+
+        df_senti["brand"] = brand
+
+        total_df = pd.concat((df_senti, total_df))
+    
+    total_df = total_df[total_df["topic"] == topic]
+
     fig5 = px.bar(
-        sentiment_df_perc,
+        total_df,
         x="brand",
         y="count",
         color="sentiment",
