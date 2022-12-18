@@ -10,9 +10,22 @@ from dashboard.utils import update_brand
 PAGE_SIZE = 5
 
 def row_item(row):
-    return dbc.ListGroupItem([
-        html.Small(row.title)
-    ])
+    print(row.asin)
+    return dbc.ListGroupItem(
+        row.title,
+        id=row.asin,
+        n_clicks=0,
+        action=True
+    )
+
+@dash.callback(
+    Output("primo", "children"),
+    Input("B000234UPQ", "n_click"),
+    prevent_initial_call=True
+)
+def click_list(n):
+    print(n)
+    return html.Small("ciao")
 
 @dash.callback(
     Output("items", "children"),
@@ -37,17 +50,6 @@ def update_table(page, brand, category):
     total = floor(len(brand_df)/PAGE_SIZE)
 
     return brand_df.iloc[start:end].apply(row_item, axis=1), total, f"Showing {PAGE_SIZE} items out of {total} results"
-
-table_header = html.Thead(
-    html.Tr(
-        [
-            html.Th("Text"),
-            html.Th("Vote", style={"width": "15%"}),
-            html.Th("Sentiment", style={"width": "15%"}),
-            html.Th("Topics", style={"width": "15%"}),
-        ],
-    ),
-)
 
 table_body = dbc.ListGroup(
     id="items",
@@ -77,15 +79,12 @@ item_list = html.Div(
     ],
 )
 
-
 layout = html.Div(
     dbc.Row(
         [
             dbc.Col(
                 html.Div(
-                    #dbc.ListGroup(id="group_list"),
                     className="panel",
-                    #style={"overflow": "scroll"},
                     children = item_list
                 ),
                 className="h-100",
@@ -97,6 +96,7 @@ layout = html.Div(
                         [
                             dbc.Col(
                                 html.Div(className="panel"),
+                                id="primo",
                                 className="h-100",
                             ),
                             dbc.Col(
@@ -129,36 +129,34 @@ layout = html.Div(
     className="page-container",
 )
 
+# @dash.callback(
+#     Output("group_list", "children"),
+#     Input("brand-select", "value"),
+#     Input("category-select", "value"),
+# )
+# def update_plot(brand, category):
+#     #update graph brand
+#     brand_df = update_brand(data_df, brand, category)
 
-@dash.callback(
-    Output("group_list", "children"),
-    Input("brand-select", "value"),
-    Input("category-select", "value"),
-)
-def update_plot(brand, category):
-    #update graph brand
-    brand_df = update_brand(data_df, brand, category)
+#     element = []
+#     for _, row in brand_df.iterrows():
+#         element.append(dbc.ListGroupItem([  
+#             html.Div([
+#                 html.Small(row.title),
+#                 html.Small("Yay!", className="text-success"),
+#             ]),
+#             html.H5("ciao, seconda riga"),
+#         ]))
 
-    element = []
-    for _, row in brand_df.iterrows():
-        element.append(dbc.ListGroupItem([  
-            html.Div([
-                html.Small(row.title),
-                html.Small("Yay!", className="text-success"),
-            ]),
-            html.H5("ciao, seconda riga"),
-        ]))
+#     return element
 
-    return element
-
-table_header = html.Thead(
-    html.Tr(
-        [
-            html.Th("Text"),
-            html.Th("Vote", style={"width": "15%"}),
-            html.Th("Sentiment", style={"width": "15%"}),
-            html.Th("Topics", style={"width": "15%"}),
-        ],
-    ),
-)
-
+# table_header = html.Thead(
+#     html.Tr(
+#         [
+#             html.Th("Text"),
+#             html.Th("Vote", style={"width": "15%"}),
+#             html.Th("Sentiment", style={"width": "15%"}),
+#             html.Th("Topics", style={"width": "15%"}),
+#         ],
+#     ),
+# )
