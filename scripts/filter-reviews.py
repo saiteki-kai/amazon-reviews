@@ -23,7 +23,7 @@ with gzip.open(raw_data_dir / "Electronics_5.json.gz") as f:
                 "reviewTime",
                 "verified",
                 "style",
-                "reviewerID",
+                # "reviewerID",
                 "reviewerName",
                 "image",
             }:
