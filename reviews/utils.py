@@ -144,7 +144,7 @@ def preprocess_df(
 ):
     args = {}
 
-    if normalize is not None:
+    if normalize is not None and normalize != "raw":
         args[normalize] = True
 
     if remove_stopwords is not None:

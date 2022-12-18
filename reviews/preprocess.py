@@ -4,14 +4,13 @@ import warnings
 
 import contractions
 import nltk
+import spacy
 from bs4 import BeautifulSoup
-from nltk.corpus import wordnet
+from nltk.corpus import stopwords, wordnet
 from nltk.sentiment.util import mark_negation
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
 from nltk.tag import pos_tag, pos_tag_sents
 from nltk.tokenize import sent_tokenize, word_tokenize
-
-from reviews.config import data_dir
 
 nltk.download("stopwords", quiet=True)
 nltk.download("punkt", quiet=True)
@@ -21,8 +20,12 @@ nltk.download("averaged_perceptron_tagger", quiet=True)
 
 warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
 
-with open(data_dir / "stopwords", "r") as f:
-    STOPWORDS = set([line.strip() for line in f.readlines()])
+# with open(data_dir / "stopwords", "r") as f:
+#    STOPWORDS2 = set([line.strip() for line in f.readlines()])
+
+STOPWORDS = set(spacy.load("en_core_web_sm").Defaults.stop_words).union(
+    stopwords.words("english")
+)
 
 # Regular expressions
 
