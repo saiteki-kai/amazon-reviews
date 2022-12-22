@@ -58,6 +58,20 @@ DOT_SENT_RE = re.compile(
     flags=re.MULTILINE,
 )
 
+CONJ = [
+    "but",
+    "still",
+    "yet",
+    "while",
+    "however",
+    "nevertheless",
+    "whereas",
+    "notwithstanding",
+    "although",
+    "even though",
+]
+CONJ_RE = re.compile(rf"(?:,\s)?\s?(?:{'|'.join(CONJ)})")
+
 WORDNET_TAGS = {
     "N": wordnet.NOUN,
     "J": wordnet.ADJ,
@@ -173,6 +187,28 @@ def normalize(
     return normalized_tokens
 
 
+def split_sentences_by_comma(tokens):
+    last_idx = len(tokens) - 1
+    indexes = [i for i, c in enumerate(tokens) if c == ","]
+
+    for i in range(len(indexes)):
+        if indexes[i] == last_idx:
+            continue
+
+        if i == len(indexes) - 1:
+            next_idx = last_idx
+        else:
+            next_idx = indexes[i + 1]
+
+        # find the number of tokens after the comma at index `indexes[i]`
+        n_next_sent_tokens = next_idx - (indexes[i] + 1)
+
+        if n_next_sent_tokens >= 8:
+            tokens[indexes[i]] = "."
+
+    return tokens
+
+
 def clean_text(text: str):
     text = remove_urls(text)
     text = strip_html(text)
@@ -195,12 +231,17 @@ def preprocess(
     lemmatization=False,
     remove_stopwords=True,
     return_tokens=True,
+    split_commas=False,
+    split_conjunctions=False,
 ):
     text = clean_text(text)
 
+    if split_conjunctions:
+        text = CONJ_RE.sub(". ", text)  # split adversative conjunctions
+
     if sentences:
         tokens = [
-            s_tokens
+            (split_sentences_by_comma(s_tokens) if split_commas else s_tokens)
             for sent in sent_tokenize(text)
             if len(s_tokens := word_tokenize(sent)) > 0
         ]
@@ -248,6 +289,9 @@ def preprocess(
         return [" ".join(sent) for sent in sent_tokens]
 
     tokens = word_tokenize(text)
+
+    if split_commas:
+        tokens = split_sentences_by_comma(tokens)
 
     tags = None
     if lemmatization:
