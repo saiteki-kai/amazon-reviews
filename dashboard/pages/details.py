@@ -41,11 +41,11 @@ def star_row(df, n):
         ],
     )
 
-tmp_id = "B0029U2YSA"
+tmp_id = "B00L64NSL2"
 
 @dash.callback(
     Output("star_distribution", "children"),
-    Output("time_product_pos_sentiment", "figure"),
+    Output("round", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
 )
@@ -53,37 +53,19 @@ def dynamic_page(brand, category):
     brand_df = update_brand(data_df, brand, category)
     brand_df = brand_df[brand_df["asin"] == tmp_id]
 
+    #star distrubution
     star = [star_row(brand_df, i) for i in range(5, 0, -1)]
 
-    # positive sentiment in time
-    sentiments_count = (
-        brand_df[brand_df["sentiment"] == "positive"]
-        .groupby(["timestamp"])["sentiment"]
-        .value_counts()
-    )
-    print(sentiments_count)
-    sentiments_df = (
-        pd.DataFrame(sentiments_count)
-        .rename(columns={"sentiment": "count"})
-        .reset_index()
-    )
+    #round
+    fig=px.pie(
+            brand_df["sentiment"].value_counts(),
+            values="sentiment",
+            color_discrete_sequence=["#f54242", "#27d957"],
+            names=["positive", "negative"],
+            hole=0.65,
+        )
 
-    fig3 = px.line(
-        sentiments_df,
-        x="timestamp",
-        y="count",
-        #color="brand",
-        # title="Sentiment Over Time",
-    )
-    fig3.update_xaxes(
-        showgrid=False,
-        title_text="",
-        # range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
-    )
-    fig3.update_yaxes(showgrid=False, title_text="# Reviews")
-    fig3.update_layout({"margin": dict(l=0, r=0, b=0)})
-
-    return star, fig3
+    return star, fig
 
 
 
@@ -93,6 +75,7 @@ def dynamic_page(brand, category):
 PAGE_SIZE = 5
 
 def row_item(row):
+    print(row.asin)
     return dbc.ListGroupItem(
         row.title,
         id=row.asin,
@@ -164,38 +147,31 @@ layout = html.Div(
                 width=4,
             ),
             dbc.Col(
+                html.Div([ 
+                    html.Div(id="star_distribution"), 
+                    html.Div(
+                        dcc.Graph( id = "round"),
+                    ),                                                                     
+                    ], className="panel",),
+                    className="h-100",
+            ),
+            dbc.Col(
                 [
                     dbc.Row(
-                        [
-                            dbc.Col(
-                                html.Div([ 
-                                    html.Div(id="star_distribution"),                                                                      
-                                ], className="panel",),
-                                className="h-100",
-                            ),
-                            dbc.Col(
-                                html.Div(className="panel"),
-                                className="h-100",
-                            ),
-                            dbc.Col(
-                                html.Div(className="panel"),
-                                className="h-100",
-                            ),
-                        ],
-                        id="row1",
-                        className="g-0",
+                        html.Div([
+                            html.Div(id="topic1"),
+                        ], className="panel",),
+                        className="h-50",
                     ),
                     dbc.Row(
-                        dbc.Col(
-                            html.Div(dcc.Graph(id="time_product_pos_sentiment"),className="panel"),
-                            className="h-100",
-                        ),
-                        id="row2",
-                        className="g-0",
-                    ),
+                        html.Div([
+                            html.Div(id="topic2"),
+                        ], className="panel",),
+                        className="h-50",
+                    )
                 ],
                 className="h-100",
-                width=8,
+               #width=8,
             ),
         ],
         className="h-100 g-0",

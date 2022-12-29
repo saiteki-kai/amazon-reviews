@@ -9,9 +9,9 @@ panel = html.Div(
         dbc.Row(
             dbc.Col(
                 [
-                    html.H3("N. Products: 7.5K"),
-                    html.H3("N. Reviews: 100K"),
-                    html.H3("AVG rating: 4.7"),
+                    html.H6("N. Products: 7.5K"),
+                    html.H6("N. Reviews: 100K"),
+                    html.H6("AVG rating: 4.7"),
                 ],
             ),
             id="row6",
