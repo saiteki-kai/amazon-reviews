@@ -2,8 +2,10 @@ from math import floor
 import dash
 import humanize
 import numpy as np
+import pandas as pd
+import plotly.express as px
 import dash_bootstrap_components as dbc
-from dash import Input, Output, html
+from dash import Input, Output, html, dcc
 
 from dashboard.app import data_df
 from dashboard.utils import update_brand
@@ -43,6 +45,7 @@ tmp_id = "B0029U2YSA"
 
 @dash.callback(
     Output("star_distribution", "children"),
+    Output("time_product_pos_sentiment", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
 )
@@ -50,7 +53,37 @@ def dynamic_page(brand, category):
     brand_df = update_brand(data_df, brand, category)
     brand_df = brand_df[brand_df["asin"] == tmp_id]
 
-    return [star_row(brand_df, i) for i in range(5, 0, -1)]
+    star = [star_row(brand_df, i) for i in range(5, 0, -1)]
+
+    # positive sentiment in time
+    sentiments_count = (
+        brand_df[brand_df["sentiment"] == "positive"]
+        .groupby(["timestamp"])["sentiment"]
+        .value_counts()
+    )
+    print(sentiments_count)
+    sentiments_df = (
+        pd.DataFrame(sentiments_count)
+        .rename(columns={"sentiment": "count"})
+        .reset_index()
+    )
+
+    fig3 = px.line(
+        sentiments_df,
+        x="timestamp",
+        y="count",
+        #color="brand",
+        # title="Sentiment Over Time",
+    )
+    fig3.update_xaxes(
+        showgrid=False,
+        title_text="",
+        # range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
+    )
+    fig3.update_yaxes(showgrid=False, title_text="# Reviews")
+    fig3.update_layout({"margin": dict(l=0, r=0, b=0)})
+
+    return star, fig3
 
 
 
@@ -66,15 +99,6 @@ def row_item(row):
         n_clicks=0,
         action=True
     )
-
-@dash.callback(
-    Output("main_info", "children"),
-    Input("B000234UPQ", "n_click"),
-    prevent_initial_call=True
-)
-def click_list(n):
-    print(n)
-    return html.Small("ciao")
 
 @dash.callback(
     Output("items", "children"),
@@ -163,7 +187,7 @@ layout = html.Div(
                     ),
                     dbc.Row(
                         dbc.Col(
-                            html.Div(className="panel"),
+                            html.Div(dcc.Graph(id="time_product_pos_sentiment"),className="panel"),
                             className="h-100",
                         ),
                         id="row2",
