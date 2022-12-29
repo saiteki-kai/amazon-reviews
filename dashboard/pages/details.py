@@ -1,16 +1,65 @@
 from math import floor
 import dash
+import humanize
+import numpy as np
 import dash_bootstrap_components as dbc
 from dash import Input, Output, html
 
 from dashboard.app import data_df
 from dashboard.utils import update_brand
 
+def star_row(df, n):
+    n_reviews = len(df[df["overall"] == n])
+
+    overall_perc = n_reviews / len(df) * 100
+    stars_icon = [html.I(className="fa-solid fa-star") for _ in range(n)]
+
+    return html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(
+                        html.Small(f"{overall_perc:.1f}% - {humanize.intcomma(n_reviews)} Reviews", className="m-0")
+                    ),
+                    dbc.Col(
+                        stars_icon,
+                        style={"textAlign": "right"},
+                    ),
+                ]
+            ),
+            dbc.Row(
+                dbc.Col(
+                    dbc.Progress(
+                        value=np.round(overall_perc),
+                        color="#108de4",
+                        style={"height": "8px"},
+                    ),
+                ),
+            ),
+        ],
+    )
+
+tmp_id = "B0029U2YSA"
+
+@dash.callback(
+    Output("star_distribution", "children"),
+    Input("brand-select", "value"),
+    Input("category-select", "value"),
+)
+def dynamic_page(brand, category):
+    brand_df = update_brand(data_df, brand, category)
+    brand_df = brand_df[brand_df["asin"] == tmp_id]
+
+    return [star_row(brand_df, i) for i in range(5, 0, -1)]
+
+
+
+
+
 
 PAGE_SIZE = 5
 
 def row_item(row):
-    print(row.asin)
     return dbc.ListGroupItem(
         row.title,
         id=row.asin,
@@ -19,7 +68,7 @@ def row_item(row):
     )
 
 @dash.callback(
-    Output("primo", "children"),
+    Output("main_info", "children"),
     Input("B000234UPQ", "n_click"),
     prevent_initial_call=True
 )
@@ -95,8 +144,9 @@ layout = html.Div(
                     dbc.Row(
                         [
                             dbc.Col(
-                                html.Div(className="panel"),
-                                id="primo",
+                                html.Div([ 
+                                    html.Div(id="star_distribution"),                                                                      
+                                ], className="panel",),
                                 className="h-100",
                             ),
                             dbc.Col(
