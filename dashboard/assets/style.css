@@ -14,9 +14,9 @@
 }
 
 .panel {
-    /*border: 1px solid black;*/
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
+    border: 1px solid black;
+    /*box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;*/
     padding: 8px;
     height: calc(100% - 16px);
     margin: 8px;
@@ -196,5 +196,4 @@
 .rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
     border-color: #108de4;
     box-shadow: 0 0 0 5px #4fb6f8;
-
 }
