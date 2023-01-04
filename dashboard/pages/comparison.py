@@ -1,11 +1,12 @@
 from collections import Counter
+
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
 from dash import Input, Output, dcc, html
 
-from dashboard.app import data_df
+from dashboard.app import data_df, topic_set
 
 layout = html.Div(
     [
@@ -23,7 +24,7 @@ layout = html.Div(
                         [
                             dcc.Dropdown(
                                 id="topic_dropdown",
-                                options = [""],
+                                options=[""],
                                 placeholder="select topic",
                                 value="Gold",
                                 clearable=False,
@@ -62,14 +63,16 @@ layout = html.Div(
     className="page-container",
 )
 
+
 @dash.callback(
     Output("topic_dropdown", "options"),
     Output("topic_dropdown", "value"),
     Input("category-select", "value"),
 )
 def update_category(category):
-    opt = [{"label": f"T{i}", "value": f"T{i}"} for i in range(0,10)]
+    opt = [{"label": f"{i}", "value": f"{i}"} for i in topic_set]
     return opt, opt[0]["value"]
+
 
 @dash.callback(
     Output("global_sentiment", "figure"),
@@ -111,9 +114,13 @@ def update_plot(brand, category, topic):
     fig2.update_layout(margin=dict(l=0, t=0, r=0, b=0))
 
     # positive sentiment in time
+    period = "Y"
+    competitors_df[period] = competitors_df["timestamp"].dt.to_period(period)
+    competitors_df[period] = competitors_df[period].dt.to_timestamp()
+
     sentiments_count = (
         competitors_df[competitors_df["sentiment"] == "positive"]
-        .groupby(["timestamp", "brand"])["sentiment"]
+        .groupby([period, "brand"])["sentiment"]
         .value_counts()
     )
     sentiments_df = (
@@ -124,7 +131,7 @@ def update_plot(brand, category, topic):
 
     fig3 = px.line(
         sentiments_df,
-        x="timestamp",
+        x=period,
         y="count",
         color="brand",
         # title="Sentiment Over Time",
@@ -140,7 +147,7 @@ def update_plot(brand, category, topic):
     # negative sentiment in time
     sentiments_count = (
         competitors_df[competitors_df["sentiment"] == "negative"]
-        .groupby(["timestamp", "brand"])["sentiment"]
+        .groupby([period, "brand"])["sentiment"]
         .value_counts()
     )
     sentiments_df = (
@@ -151,7 +158,7 @@ def update_plot(brand, category, topic):
 
     fig4 = px.line(
         sentiments_df,
-        x="timestamp",
+        x=period,
         y="count",
         color="brand",
         # title="Sentiment Over Time",
@@ -173,8 +180,8 @@ def update_plot(brand, category, topic):
 
         brand_df = competitors_df[competitors_df["brand"] == brand]
         for t in brand_df["topics"].values:
-            pos_topics = set([f"T{s['topic']}" for s in t if s["sentiment"] == 0])
-            neg_topics = set([f"T{s['topic']}" for s in t if s["sentiment"] == 1])
+            pos_topics = set([s["name"] for s in t if s["sentiment"] == 0])
+            neg_topics = set([s["name"] for s in t if s["sentiment"] == 1])
 
             pos_count.update(pos_topics)
             neg_count.update(neg_topics)
@@ -201,7 +208,7 @@ def update_plot(brand, category, topic):
         df_senti["brand"] = brand
 
         total_df = pd.concat((df_senti, total_df))
-    
+
     total_df = total_df[total_df["topic"] == topic]
 
     fig5 = px.bar(

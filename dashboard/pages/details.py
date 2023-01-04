@@ -108,7 +108,7 @@ def dynamic_page(brand, category, product_ids):
     # topics
     count = Counter()
     for x in brand_df["topics"].values:
-        topics = set(["T" + str(y["topic"]) for y in x])
+        topics = set([str(y["name"]) for y in x])
         count.update(topics)
 
     topics_count = pd.DataFrame(count.items(), columns=["topic", "count"])
@@ -132,8 +132,8 @@ def dynamic_page(brand, category, product_ids):
     neg_count = Counter()
 
     for t in brand_df["topics"].values:
-        pos_topics = set([f"T{s['topic']}" for s in t if s["sentiment"] == 0])
-        neg_topics = set([f"T{s['topic']}" for s in t if s["sentiment"] == 1])
+        pos_topics = set([f"{s['name']}" for s in t if s["sentiment"] == 0])
+        neg_topics = set([f"{s['name']}" for s in t if s["sentiment"] == 1])
 
         pos_count.update(pos_topics)
         neg_count.update(neg_topics)
@@ -150,7 +150,7 @@ def dynamic_page(brand, category, product_ids):
 
     st_counts.set_index("topic", inplace=True)
     st_counts.sort_index(inplace=True)
-    st_counts = st_counts.iloc[[int(o[1:]) for o in order][::-1]]
+    # st_counts = st_counts.iloc[[int(o[1:]) for o in order][::-1]]
 
     df_senti = (
         st_counts.stack(level=0)
