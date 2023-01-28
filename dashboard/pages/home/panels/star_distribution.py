@@ -56,7 +56,6 @@ def star_row(df, n):
 def star_distribution(brand, category):
     # update graph brand
     brand_df = update_brand(data_df, brand, category)
-
     return [star_row(brand_df, i) for i in range(5, 0, -1)]
 
 

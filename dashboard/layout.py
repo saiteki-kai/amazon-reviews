@@ -1,8 +1,9 @@
 from dash import Input, Output, callback, dcc, html
 
 from dashboard.components import navbar
-from dashboard.pages import comparison, details
+from dashboard.pages.comparison import comparison
 from dashboard.pages.home import home
+from dashboard.pages.products import products
 
 layout = html.Div(
     [
@@ -18,7 +19,7 @@ def render_page_content(pathname):
     if pathname == "/":
         return home.layout
     elif pathname == "/details":
-        return details.layout
+        return products.layout
     elif pathname == "/comparison":
         return comparison.layout
 

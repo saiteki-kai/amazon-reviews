@@ -34,13 +34,13 @@ layout = dbc.Navbar(
                                 className="navbar-dark",
                             ),
                             dbc.NavLink(
-                                "Products",
+                                "products",
                                 href="/details",
                                 active="exact",
                                 className="navbar-dark",
                             ),
                             dbc.NavLink(
-                                "Comparison",
+                                "comparison",
                                 href="/comparison",
                                 active="exact",
                                 className="navbar-dark",

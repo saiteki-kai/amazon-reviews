@@ -1,15 +1,15 @@
 import dash_bootstrap_components as dbc
-import plotly.express as px
 from dash import dcc, html
 
 from dashboard.app import data_df
+from dashboard.components.sentiment_piechart import sentiment_piechart
 
 panel = html.Div(
     [
         dbc.Row(
             dbc.Col(
                 [
-                    html.H6("N. Products: 7.5K"),
+                    html.H6("N. products: 7.5K"),
                     html.H6("N. Reviews: 100K"),
                     html.H6("AVG rating: 4.7"),
                 ],
@@ -18,15 +18,7 @@ panel = html.Div(
         ),
         dbc.Row(
             dbc.Col(
-                dcc.Graph(
-                    figure=px.pie(
-                        data_df["sentiment"].value_counts(),
-                        values="sentiment",
-                        color_discrete_sequence=["#f54242", "#27d957"],
-                        names=["positive", "negative"],
-                        hole=0.65,
-                    )
-                ),
+                dcc.Graph(figure=sentiment_piechart(data_df)),
                 className="h-100",
             ),
             id="row7",
