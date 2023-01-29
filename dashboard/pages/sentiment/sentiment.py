@@ -1,36 +1,7 @@
-import dash
 import dash_bootstrap_components as dbc
-from dash import Input, Output, html
+from dash import html
 
-from dashboard.app import data_df
-from dashboard.pages.home.panels import (
-    categories,
-    sentiment_over_time,
-    star_distribution,
-    topics,
-    word_cloud,
-)
-
-
-@dash.callback(
-    Output("category-select", "options"),
-    Output("category-select", "value"),
-    Input("brand-select", "value"),
-    Input("url", "pathname"),
-)
-def update_categories(brand, pathname):
-    df = data_df[data_df["brand"] == brand]
-
-    categories = list(df["category"].value_counts().index)
-    options = [{"label": c, "value": c} for c in categories]
-
-    if pathname == "/comparison":
-        return options, options[0]["value"]
-
-    options = [{"label": "All", "value": "All"}] + options
-
-    return options, "All"
-
+from dashboard.pages.sentiment.panels import category, sentiment, topic
 
 layout = html.Div(
     [
@@ -41,17 +12,17 @@ layout = html.Div(
                         dbc.Row(
                             [
                                 dbc.Col(
-                                    star_distribution.panel,
+                                    sentiment.panel,
                                     width=4,
                                     className="h-100",
                                 ),
                                 dbc.Col(
-                                    categories.panel,
+                                    category.panel,
                                     width=4,
                                     className="h-100",
                                 ),
                                 dbc.Col(
-                                    topics.panel,
+                                    topic.panel,
                                     width=4,
                                     className="h-100",
                                 ),
@@ -72,12 +43,12 @@ layout = html.Div(
                     dbc.Row(
                         [
                             dbc.Col(
-                                sentiment_over_time.panel,
+                                html.Div(className="panel"),
                                 width=8,
                                 className="h-100",
                             ),
                             dbc.Col(
-                                word_cloud.panel,
+                                html.Div(className="panel"),
                                 width=4,
                                 className="h-100",
                             ),

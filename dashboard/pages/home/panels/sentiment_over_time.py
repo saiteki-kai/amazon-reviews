@@ -45,7 +45,7 @@ def plot_sentiment_over_time(period, years, brand, category):
         range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
     )
     fig.update_yaxes(showgrid=False, title_text="# Reviews")
-    fig.update_layout(margin=dict(l=0, r=0, b=0))
+    fig.update_layout(margin=dict(l=0, t=30, r=0, b=0), title_pad=dict(t=0, b=0))
 
     return fig
 
@@ -86,7 +86,11 @@ panel = html.Div(
             [
                 dbc.Col(
                     dcc.RangeSlider(
-                        1999, 2018, 1, value=[1999, 2018], id="years-slider"
+                        1999,
+                        2018,
+                        1,
+                        value=[1999, 2018],
+                        id="years-slider",
                     )
                 ),
                 dbc.Col(
@@ -99,12 +103,15 @@ panel = html.Div(
                                 {"label": "Month", "value": "M"},
                                 {"label": "Year", "value": "Y"},
                             ],
+                            className="pe-0",
                             value="Y",
+                            size="sm",
                         ),
                     ],
                     width=2,
                 ),
-            ]
+            ],
+            className="pt-1",
         ),
     ],
     className="panel",

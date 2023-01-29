@@ -1,6 +1,8 @@
 import pandas as pd
 import plotly.express as px
 
+from dashboard.utils import default_layout
+
 
 def category_sentiment_barplot(brand_df, order):
     sentiments_count = brand_df.groupby("category")["sentiment"].value_counts()
@@ -12,16 +14,20 @@ def category_sentiment_barplot(brand_df, order):
         .rename(columns={"sentiment": "count"})
         .reset_index()
     )
-    fig2 = px.bar(
+    category_orders = {"sentiment": ["positive", "negative"]}
+
+    fig = px.bar(
         sentiments_df_perc,
         x="count",
         y="category",
         color="sentiment",
-        color_discrete_sequence=["#f54242", "#27d957"],
+        color_discrete_sequence=["#27d957", "#f54242"],
         barmode="relative",
-        category_orders=order,
+        category_orders=category_orders,
+        title="Sentiment By Category",
     )
-    fig2.update_xaxes(showgrid=False, title_text="")
-    fig2.update_yaxes(showgrid=False, title_text="", showticklabels=False)
-    fig2.update_layout(margin=dict(l=0, t=0, r=0, b=0))
-    return fig2
+
+    fig.update_layout(default_layout)
+    fig.update_xaxes(ticksuffix="%")
+
+    return fig

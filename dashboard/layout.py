@@ -4,6 +4,7 @@ from dashboard.components import navbar
 from dashboard.pages.comparison import comparison
 from dashboard.pages.home import home
 from dashboard.pages.products import products
+from dashboard.pages.sentiment import sentiment
 
 layout = html.Div(
     [
@@ -20,6 +21,8 @@ def render_page_content(pathname):
         return home.layout
     elif pathname == "/details":
         return products.layout
+    elif pathname == "/sentiment":
+        return sentiment.layout
     elif pathname == "/comparison":
         return comparison.layout
 

@@ -1,7 +1,7 @@
 /* Global ----------------------------------------------------------------------------------------------------------- */
 .navbar {
-    background-color: #108de4 !important;
     color: #fff;
+    height: 56px;
 }
 
 #page-content {
@@ -64,7 +64,7 @@
 }
 
 #sentiment-over-time {
-    height: 90%;
+    height: calc(85% - .25rem);
 }
 
 /* products Page ---------------------------------------------------------------------------------------------------- */
@@ -186,10 +186,10 @@
 }
 
 .rc-slider-dot-active {
-  border-color: #108de4;
+    border-color: #108de4;
 }
 
-.rc-slider-handle:hover, .rc-slider-handle:active, .rc-slider-handle-click-focused:focus{
+.rc-slider-handle:hover, .rc-slider-handle:active, .rc-slider-handle-click-focused:focus {
     border-color: #108de4;
 }
 

@@ -2,22 +2,23 @@ import dash
 from dash import Input, Output, dcc, html
 
 from dashboard.app import data_df
-from dashboard.components.reviews_rating import reviews_rating
+from dashboard.components.topics_barplot import topics_barplot
 from dashboard.utils import update_brand
 
 
 @dash.callback(
-    Output("star-distribution", "figure"),
+    Output("topics-distribution", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
 )
-def star_distribution(brand, category):
+def update_topics(brand, category):
     # update graph brand
     brand_df = update_brand(data_df, brand, category)
-    return reviews_rating(brand_df)
+    fig1, order = topics_barplot(brand_df)
+    return fig1
 
 
 panel = html.Div(
-    dcc.Graph(id="star-distribution", config={"displayModeBar": False}),
+    dcc.Graph(id="topics-distribution", config={"displayModeBar": False}),
     className="panel",
 )

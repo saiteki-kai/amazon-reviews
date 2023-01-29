@@ -3,6 +3,8 @@ from collections import Counter
 import pandas as pd
 import plotly.express as px
 
+from dashboard.utils import default_layout, secondary_color
+
 
 def topics_barplot(brand_df):
     count = Counter()
@@ -20,11 +22,11 @@ def topics_barplot(brand_df):
         topics_count,
         y="topic",
         x="count",
-        color_discrete_sequence=["#108de4"],
+        color_discrete_sequence=[secondary_color],
         category_orders=dict(topic=order),
+        title="Topics",
     )
-    fig1.update_xaxes(showgrid=False, title_text="")
-    fig1.update_yaxes(showgrid=False, title_text="")
-    fig1.update_layout({"margin": dict(l=0, t=0, r=0, b=0)})
+
+    fig1.update_layout(default_layout)
 
     return fig1, order

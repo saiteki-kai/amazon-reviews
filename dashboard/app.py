@@ -5,7 +5,7 @@ from dash import Dash
 from reviews.config import asum_output_dir
 
 external_stylesheets = [
-    dbc.themes.BOOTSTRAP,
+    dbc.themes.LUX,
     dbc.icons.FONT_AWESOME,
     "./assets/style.css",
 ]
@@ -18,34 +18,31 @@ app = Dash(
 
 data_df = pd.read_json(asum_output_dir / "reviews_sentiments.json.gz")
 data_df = data_df[
-    data_df["brand"].isin(list(data_df["brand"].value_counts()[:100].index))
+    data_df["brand"].isin(list(data_df["brand"].value_counts()[:40].index))
 ]
 
 topic_set = {
-    "power supply system",
-    "case",
-    "brand",
-    "drivers",
-    "pc replacement / upgrade",
-    "network",
-    "storage",
-    "monitor",
+    "?",
     "aesthetic",
-    "temperature",
-    "audio/video cards",
+    "buy",
     "cooling system",
-    "price",
-    "build",
+    "delivery",
     "installation",
-    "sound card",
-    "recommended",
-    "processor",
-    "thermal paste",
-    "performance",
-    "service",
-    "gaming",
-    "quality",
     "memory",
-    "graphic card",
     "motherboard",
+    "optical disc",
+    "overclocking",
+    "pc",
+    "performance",
+    "price",
+    "processor",
+    "psu",
+    "quality",
+    "satisfaction/recommanded",
+    "sound",
+    "storage connectivity",
+    "temperature",
+    "time",
+    "upgrade",
+    "video",
 }

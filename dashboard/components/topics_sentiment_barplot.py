@@ -3,6 +3,8 @@ from collections import Counter
 import pandas as pd
 import plotly.express as px
 
+from dashboard.utils import default_layout
+
 
 def topics_sentiment_barplot(brand_df, order):
     pos_count = Counter()
@@ -15,15 +17,15 @@ def topics_sentiment_barplot(brand_df, order):
         pos_count.update(pos_topics)
         neg_count.update(neg_topics)
 
-    pos_df = pd.DataFrame(pos_count.items(), columns=["topic", "pos"])
-    neg_df = pd.DataFrame(neg_count.items(), columns=["topic", "neg"])
+    pos_df = pd.DataFrame(pos_count.items(), columns=["topic", "positive"])
+    neg_df = pd.DataFrame(neg_count.items(), columns=["topic", "negative"])
 
     st_counts = pd.merge(pos_df, neg_df, on="topic")
     st_counts["topic"] = st_counts["topic"].astype("category")
 
-    total = st_counts["pos"] + st_counts["neg"]
-    st_counts["pos"] = st_counts["pos"] / total * 100
-    st_counts["neg"] = st_counts["neg"] / total * 100
+    total = st_counts["positive"] + st_counts["negative"]
+    st_counts["positive"] = st_counts["positive"] / total * 100
+    st_counts["negative"] = st_counts["negative"] / total * 100
 
     st_counts.set_index("topic", inplace=True)
     st_counts.sort_index(inplace=True)
@@ -35,18 +37,19 @@ def topics_sentiment_barplot(brand_df, order):
         .rename(columns={"level_1": "sentiment", 0: "count"})
     )
 
-    fig2 = px.bar(
+    category_orders = {"sentiment": ["positive", "negative"]}
+
+    fig = px.bar(
         df_senti,
         y="topic",
         x="count",
         color="sentiment",
-        color_discrete_sequence=["#f54242", "#27d957"],
+        color_discrete_sequence=["#27d957", "#f54242"],
         barmode="relative",
-        category_orders=dict(topic=order),
+        category_orders=category_orders,
+        title="Sentiment By Topic",
     )
+    fig.update_layout(default_layout)
+    fig.update_xaxes(ticksuffix="%")
 
-    fig2.update_xaxes(showgrid=False, title_text="")
-    fig2.update_yaxes(showgrid=False, title_text="")
-    fig2.update_layout({"margin": dict(l=0, t=0, r=0, b=0)})
-    fig2.update_layout({"margin": dict(l=0, t=0, r=0, b=0)})
-    return fig2
+    return fig

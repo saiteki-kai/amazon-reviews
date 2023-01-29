@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import dcc, html
 
 from dashboard.app import data_df
 
@@ -12,13 +12,17 @@ brand_select = dbc.Select(
     ],
     value="corsair",
     class_name="mr-2",
+    size="sm",
 )
 
 # Brand Categories Select
 category_select = dbc.Select(
     id="category-select",
     options=[],
+    size="sm",
 )
+
+date_picker = dcc.DatePickerRange()
 
 layout = dbc.Navbar(
     dbc.Container(
@@ -34,13 +38,19 @@ layout = dbc.Navbar(
                                 className="navbar-dark",
                             ),
                             dbc.NavLink(
-                                "products",
+                                "Sentiment",
+                                href="/sentiment",
+                                active="exact",
+                                className="navbar-dark",
+                            ),
+                            dbc.NavLink(
+                                "Products",
                                 href="/details",
                                 active="exact",
                                 className="navbar-dark",
                             ),
                             dbc.NavLink(
-                                "comparison",
+                                "Comparison",
                                 href="/comparison",
                                 active="exact",
                                 className="navbar-dark",
@@ -68,9 +78,10 @@ layout = dbc.Navbar(
                         ],
                         justify="between",
                     ),
-                    width=5,
+                    width=6,
                 ),
             ],
+            align="center",
             justify="between",
             class_name="w-100",
         ),

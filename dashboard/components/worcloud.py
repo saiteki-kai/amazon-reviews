@@ -1,5 +1,3 @@
-import base64
-import io
 from collections import Counter
 
 from wordcloud import WordCloud
@@ -23,18 +21,13 @@ def wordcloud(brand_df):
     ):
         return "hsl(0,100%, 1%)"
 
-    img = io.BytesIO()
     wc = WordCloud(
-        height=200,
-        width=300,
+        height=500,
+        width=750,
         background_color="white",
         color_func=black_color_func,
-        max_words=500,
+        max_words=200,
     )
     wc.generate_from_frequencies(Counter(x))
     wc.recolor(color_func=black_color_func)
-    wc.to_file("../output/wc.png")
-
-    img_base64 = base64.b64encode(img.getvalue()).decode()
-
-    return "data:image/png;base64,{}".format(img_base64)
+    return wc.to_image()
