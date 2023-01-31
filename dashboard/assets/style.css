@@ -178,22 +178,22 @@
 }*/
 
 .rc-slider-track {
-    background-color: #108de4;
+    background-color: #C3C5C5;
 }
 
 .rc-slider-handle {
-    border: solid 2px #108de4;
+    border: solid 2px #C3C5C5;
 }
 
 .rc-slider-dot-active {
-    border-color: #108de4;
+    border-color: #C3C5C5;
 }
 
 .rc-slider-handle:hover, .rc-slider-handle:active, .rc-slider-handle-click-focused:focus {
-    border-color: #108de4;
+    border-color: #C3C5C5;
 }
 
 .rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
-    border-color: #108de4;
-    box-shadow: 0 0 0 5px #4fb6f8;
+    border-color: #C3C5C5;
+    box-shadow: 0 0 0 5px #9d9d9d;
 }

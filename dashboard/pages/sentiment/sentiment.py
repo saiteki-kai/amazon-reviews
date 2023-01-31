@@ -1,7 +1,12 @@
 import dash_bootstrap_components as dbc
 from dash import html
 
-from dashboard.pages.sentiment.panels import category, sentiment, topic
+from dashboard.pages.sentiment.panels import (
+    category,
+    sentiment,
+    sentiment_over_time,
+    topic,
+)
 
 layout = html.Div(
     [
@@ -43,7 +48,7 @@ layout = html.Div(
                     dbc.Row(
                         [
                             dbc.Col(
-                                html.Div(className="panel"),
+                                sentiment_over_time.panel,
                                 width=8,
                                 className="h-100",
                             ),

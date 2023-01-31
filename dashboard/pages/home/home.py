@@ -5,7 +5,7 @@ from dash import Input, Output, html
 from dashboard.app import data_df
 from dashboard.pages.home.panels import (
     categories,
-    sentiment_over_time,
+    reviews_over_time,
     star_distribution,
     topics,
     word_cloud,
@@ -72,7 +72,7 @@ layout = html.Div(
                     dbc.Row(
                         [
                             dbc.Col(
-                                sentiment_over_time.panel,
+                                reviews_over_time.panel,
                                 width=8,
                                 className="h-100",
                             ),
