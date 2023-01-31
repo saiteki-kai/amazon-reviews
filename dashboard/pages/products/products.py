@@ -1,56 +1,15 @@
-from collections import Counter
 from math import floor
 
 import dash
 import dash_bootstrap_components as dbc
-import humanize
-import numpy as np
-import pandas as pd
-import plotly.express as px
 from dash import ALL, Input, Output, dcc, html
 
 from dashboard.app import data_df
+from dashboard.components.reviews_rating import reviews_rating
+from dashboard.components.sentiment_piechart import sentiment_piechart
+from dashboard.components.topics_barplot import topics_barplot
+from dashboard.components.topics_sentiment_barplot import topics_sentiment_barplot
 from dashboard.utils import update_brand
-
-
-def star_row(df, n):
-    n_reviews = len(df[df["overall"] == n])
-
-    if n_reviews == 0:
-        return "0"
-
-    overall_perc = n_reviews / len(df) * 100
-    stars_icon = [html.I(className="fa-solid fa-star") for _ in range(n)]
-
-    return html.Div(
-        [
-            dbc.Row(
-                [
-                    dbc.Col(
-                        html.Small(
-                            f"{overall_perc:.1f}%\
-                             - {humanize.intcomma(n_reviews)} Reviews",
-                            className="m-0",
-                        )
-                    ),
-                    dbc.Col(
-                        stars_icon,
-                        style={"textAlign": "right"},
-                    ),
-                ]
-            ),
-            dbc.Row(
-                dbc.Col(
-                    dbc.Progress(
-                        value=np.round(overall_perc),
-                        color="#108de4",
-                        style={"height": "8px"},
-                    ),
-                ),
-            ),
-        ],
-    )
-
 
 tmp_id = "B00L64NSL2"
 
@@ -77,7 +36,7 @@ def set_active(product_clicks, product_ids):
 
 
 @dash.callback(
-    Output("star_distribution", "children"),
+    Output("star_distribution", "figure"),
     Output("round", "figure"),
     Output("topics1", "figure"),
     Output("topics2", "figure"),
@@ -93,86 +52,11 @@ def dynamic_page(brand, category, product_ids):
         # brand_df = brand_df[brand_df["asin"] == selected_asin]
         print("Selected ASIN:", selected_asin)
 
-    # star distribution
-    star = [star_row(brand_df, i) for i in range(5, 0, -1)]
-
-    # round
-    fig = px.pie(
-        brand_df["sentiment"].value_counts(),
-        values="sentiment",
-        color_discrete_sequence=["#f54242", "#27d957"],
-        names=["positive", "negative"],
-        hole=0.65,
-    )
-
-    # topics
-    count = Counter()
-    for x in brand_df["topics"].values:
-        topics = set([str(y["name"]) for y in x])
-        count.update(topics)
-
-    topics_count = pd.DataFrame(count.items(), columns=["topic", "count"])
-    # topics_count["topic"] = topics_count["topic"].astype("category")
-
-    order = topics_count.sort_values(by="count", ascending=False)
-    order = order.reset_index()["topic"]
-
-    fig1 = px.bar(
-        topics_count,
-        y="topic",
-        x="count",
-        color_discrete_sequence=["#108de4"],
-        category_orders=dict(topic=order),
-    )
-    fig1.update_xaxes(showgrid=False, title_text="")
-    fig1.update_yaxes(showgrid=False, title_text="")
-    fig1.update_layout({"margin": dict(l=0, t=0, r=0, b=0)})
-
-    pos_count = Counter()
-    neg_count = Counter()
-
-    for t in brand_df["topics"].values:
-        pos_topics = set([f"{s['name']}" for s in t if s["sentiment"] == 0])
-        neg_topics = set([f"{s['name']}" for s in t if s["sentiment"] == 1])
-
-        pos_count.update(pos_topics)
-        neg_count.update(neg_topics)
-
-    pos_df = pd.DataFrame(pos_count.items(), columns=["topic", "pos"])
-    neg_df = pd.DataFrame(neg_count.items(), columns=["topic", "neg"])
-
-    st_counts = pd.merge(pos_df, neg_df, on="topic")
-    st_counts["topic"] = st_counts["topic"].astype("category")
-
-    total = st_counts["pos"] + st_counts["neg"]
-    st_counts["pos"] = st_counts["pos"] / total * 100
-    st_counts["neg"] = st_counts["neg"] / total * 100
-
-    st_counts.set_index("topic", inplace=True)
-    st_counts.sort_index(inplace=True)
-    # st_counts = st_counts.iloc[[int(o[1:]) for o in order][::-1]]
-
-    df_senti = (
-        st_counts.stack(level=0)
-        .reset_index()
-        .rename(columns={"level_1": "sentiment", 0: "count"})
-    )
-
-    fig2 = px.bar(
-        df_senti,
-        y="topic",
-        x="count",
-        color="sentiment",
-        color_discrete_sequence=["#f54242", "#27d957"],
-        barmode="relative",
-        category_orders=dict(topic=order),
-    )
-
-    fig2.update_xaxes(showgrid=False, title_text="")
-    fig2.update_yaxes(showgrid=False, title_text="")
-    fig2.update_layout({"margin": dict(l=0, t=0, r=0, b=0)})
-
-    return star, fig, fig1, fig2
+    fig1 = reviews_rating(brand_df)
+    fig2 = sentiment_piechart(brand_df)
+    fig3, order = topics_barplot(brand_df)
+    fig4 = topics_sentiment_barplot(brand_df, order)
+    return fig1, fig2, fig3, fig4
 
 
 PAGE_SIZE = 5
