@@ -50,13 +50,14 @@ def dynamic_page(brand, category, year, product_ids):
 
     if not all([prod is None for prod in product_ids]):
         selected_asin = dash.callback_context.triggered_id["asin"]
-        # brand_df = brand_df[brand_df["asin"] == selected_asin]
+        brand_df = brand_df[brand_df["asin"] == selected_asin]
         print("Selected ASIN:", selected_asin)
 
     fig1 = reviews_rating(brand_df)
     fig2 = sentiment_piechart(brand_df)
     fig3, order = topics_barplot(brand_df)
     fig4 = topics_sentiment_barplot(brand_df, order)
+
     return fig1, fig2, fig3, fig4
 
 
@@ -137,40 +138,52 @@ layout = html.Div(
                 width=4,
             ),
             dbc.Col(
-                html.Div(
-                    [
-                        html.Div(id="star_distribution"),
-                        html.Div(
-                            dcc.Graph(id="round"),
+                [
+                    dbc.Row(
+                        dbc.Col(
+                            html.Div(
+                                id="star_distribution",
+                                className="panel",
+                            ),
+                            className="row-50",
                         ),
-                    ],
-                    className="panel",
-                ),
+                    ),
+                    dbc.Row(
+                        dbc.Col(
+                            html.Div(
+                                dcc.Graph(id="round"),
+                                className="panel",
+                            )
+                        ),
+                        className="row-50",
+                    ),
+                ],
                 className="h-100",
+                width=4,
             ),
             dbc.Col(
                 [
                     dbc.Row(
-                        html.Div(
-                            [
-                                html.Div(dcc.Graph(id="topics1")),
-                            ],
-                            className="panel",
+                        dbc.Col(
+                            html.Div(
+                                dcc.Graph(id="topics1"),
+                                className="panel",
+                            ),
                         ),
-                        className="h-50",
+                        className="g-0 row-50",
                     ),
                     dbc.Row(
-                        html.Div(
-                            [
-                                html.Div(dcc.Graph(id="topics2")),
-                            ],
-                            className="panel",
+                        dbc.Col(
+                            html.Div(
+                                dcc.Graph(id="topics2"),
+                                className="panel",
+                            ),
                         ),
-                        className="h-50",
+                        className="g-0 row-50",
                     ),
                 ],
                 className="h-100",
-                # width=8,
+                width=4,
             ),
         ],
         className="h-100 g-0",
