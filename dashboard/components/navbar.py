@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import html
 
 from dashboard.app import data_df
 
@@ -7,11 +7,9 @@ from dashboard.app import data_df
 brand_select = dbc.Select(
     id="brand-select",
     options=[
-        {"label": brand, "value": brand}
-        for brand in list(data_df["brand"].value_counts().index)
+        {"label": brand, "value": brand} for brand in list(data_df["brand"].unique())
     ],
     value="corsair",
-    class_name="mr-2",
     size="sm",
 )
 
@@ -22,7 +20,13 @@ category_select = dbc.Select(
     size="sm",
 )
 
-date_picker = dcc.DatePickerRange()
+years = sorted(list(data_df["timestamp"].dt.year.unique()))[::-1]
+year_select = dbc.Select(
+    id="year-select",
+    options=[{"label": year, "value": year} for year in years],
+    value=str(years[0]),
+    size="sm",
+)
 
 layout = dbc.Navbar(
     dbc.Container(
@@ -63,22 +67,29 @@ layout = dbc.Navbar(
                         [
                             dbc.Col(
                                 html.Div(
+                                    [html.Span("Year"), year_select],
+                                    className="select-container",
+                                ),
+                                width=3,
+                            ),
+                            dbc.Col(
+                                html.Div(
                                     [html.Span("Brand"), brand_select],
                                     className="select-container",
                                 ),
-                                width=5,
+                                width=4,
                             ),
                             dbc.Col(
                                 html.Div(
                                     [html.Span("Category"), category_select],
                                     className="select-container",
                                 ),
-                                width=7,
+                                width=5,
                             ),
                         ],
                         justify="between",
                     ),
-                    width=6,
+                    width=8,
                 ),
             ],
             align="center",

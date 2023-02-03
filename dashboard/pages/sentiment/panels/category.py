@@ -10,10 +10,11 @@ from dashboard.utils import update_brand
     Output("categories-distribution-perc", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("year-select", "value"),
 )
-def update_brand_categories(brand, category):
+def update_brand_categories(brand, category, year):
     # update graph brand
-    brand_df = update_brand(data_df, brand, category)
+    brand_df = update_brand(data_df, brand, category, year)
     order = dict(category=list(brand_df["category"].value_counts().index))
 
     return category_sentiment_barplot(brand_df, order)

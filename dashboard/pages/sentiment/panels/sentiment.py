@@ -11,9 +11,10 @@ from dashboard.utils import default_layout, update_brand
     Output("sentiment-distribution", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("year-select", "value"),
 )
-def update_sentiment(brand, category):
-    brand_df = update_brand(data_df, brand, category)
+def update_sentiment(brand, category, year):
+    brand_df = update_brand(data_df, brand, category, year)
 
     df = pd.DataFrame(brand_df["sentiment"].value_counts().reset_index())
     df = df.rename(columns={"index": "sentiment", "sentiment": "count"})

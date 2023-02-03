@@ -10,10 +10,11 @@ from dashboard.utils import update_brand
     Output("star-distribution", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("year-select", "value"),
 )
-def star_distribution(brand, category):
+def star_distribution(brand, category, year):
     # update graph brand
-    brand_df = update_brand(data_df, brand, category)
+    brand_df = update_brand(data_df, brand, category, year)
     return reviews_rating(brand_df)
 
 

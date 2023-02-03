@@ -11,10 +11,11 @@ from dashboard.utils import update_brand
     Output("topics-distribution-perc", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("year-select", "value"),
 )
-def update_topics_sentiment(brand, category):
+def update_topics_sentiment(brand, category, year):
     # update graph brand
-    brand_df = update_brand(data_df, brand, category)
+    brand_df = update_brand(data_df, brand, category, year)
     _, order = topics_barplot(brand_df)
     fig = topics_sentiment_barplot(brand_df, order)
 

@@ -42,10 +42,11 @@ def set_active(product_clicks, product_ids):
     Output("topics2", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("year-select", "value"),
     Input({"type": "item", "asin": ALL}, "n_clicks"),
 )
-def dynamic_page(brand, category, product_ids):
-    brand_df = update_brand(data_df, brand, category)
+def dynamic_page(brand, category, year, product_ids):
+    brand_df = update_brand(data_df, brand, category, year)
 
     if not all([prod is None for prod in product_ids]):
         selected_asin = dash.callback_context.triggered_id["asin"]
@@ -78,9 +79,10 @@ def row_item(row):
     Input("pagination", "active_page"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("year-select", "value"),
 )
-def update_table(page, brand, category):
-    brand_df = update_brand(data_df, brand, category)
+def update_table(page, brand, category, year):
+    brand_df = update_brand(data_df, brand, category, year)
     brand_df = brand_df.drop_duplicates(["asin"])
 
     if not page:
