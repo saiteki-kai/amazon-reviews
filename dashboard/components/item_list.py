@@ -14,12 +14,7 @@ reviews_df = reviews_df[:1000]
 
 
 def vote(stars):
-    return html.Div(
-        [
-            html.I(className=f"bi bi-star{'-fill' if i < stars else ''}")
-            for i in range(5)
-        ]
-    )
+    return html.Div([html.I(className=f"bi bi-star{'-fill' if i < stars else ''}") for i in range(5)])
 
 
 def topic_badge(topic):
@@ -123,9 +118,7 @@ item_list = html.Div(
                 dbc.CardHeader(
                     [
                         html.H6("Reviews", className="m-2"),
-                        dbc.Input(
-                            id="search", placeholder="Search products...", type="text"
-                        ),
+                        dbc.Input(id="search", placeholder="Search products...", type="text"),
                     ],
                 ),
                 dbc.CardBody(

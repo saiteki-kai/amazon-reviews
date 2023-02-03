@@ -23,11 +23,7 @@ def global_sentiment_barplot(brand, competitors, competitors_df):
     # global sentiment
     sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
     sentiment_df_perc = sentiment_df / sentiment_df.groupby("brand").sum()
-    sentiment_df_perc = (
-        pd.DataFrame(sentiment_df_perc * 100)
-        .rename(columns={"sentiment": "count"})
-        .reset_index()
-    )
+    sentiment_df_perc = pd.DataFrame(sentiment_df_perc * 100).rename(columns={"sentiment": "count"}).reset_index()
 
     fig2 = px.bar(
         sentiment_df_perc,
@@ -49,15 +45,9 @@ def positive_sentiment_overtime_plot(period, competitors_df):
     competitors_df[period] = competitors_df[period].dt.to_timestamp()
 
     sentiments_count = (
-        competitors_df[competitors_df["sentiment"] == "positive"]
-        .groupby([period, "brand"])["sentiment"]
-        .value_counts()
+        competitors_df[competitors_df["sentiment"] == "positive"].groupby([period, "brand"])["sentiment"].value_counts()
     )
-    sentiments_df = (
-        pd.DataFrame(sentiments_count)
-        .rename(columns={"sentiment": "count"})
-        .reset_index()
-    )
+    sentiments_df = pd.DataFrame(sentiments_count).rename(columns={"sentiment": "count"}).reset_index()
 
     fig3 = px.line(
         sentiments_df,
@@ -79,15 +69,9 @@ def positive_sentiment_overtime_plot(period, competitors_df):
 def negative_sentiment_overtime_plot(period, competitors_df):
     # negative sentiment in time
     sentiments_count = (
-        competitors_df[competitors_df["sentiment"] == "negative"]
-        .groupby([period, "brand"])["sentiment"]
-        .value_counts()
+        competitors_df[competitors_df["sentiment"] == "negative"].groupby([period, "brand"])["sentiment"].value_counts()
     )
-    sentiments_df = (
-        pd.DataFrame(sentiments_count)
-        .rename(columns={"sentiment": "count"})
-        .reset_index()
-    )
+    sentiments_df = pd.DataFrame(sentiments_count).rename(columns={"sentiment": "count"}).reset_index()
 
     fig4 = px.line(
         sentiments_df,
@@ -135,11 +119,7 @@ def sentiment_topic_plot(brand, competitors, competitors_df):
             st_counts.set_index("topic", inplace=True)
             st_counts.sort_index(inplace=True)
 
-            df_senti = (
-                st_counts.stack(level=0)
-                .reset_index()
-                .rename(columns={"level_1": "sentiment", 0: "count"})
-            )
+            df_senti = st_counts.stack(level=0).reset_index().rename(columns={"level_1": "sentiment", 0: "count"})
 
             df_senti["brand"] = brand
 

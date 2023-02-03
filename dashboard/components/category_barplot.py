@@ -7,13 +7,9 @@ from dashboard.utils import default_layout, secondary_color
 def category_barplot(brand_df, order):
     category_count = brand_df["category"].value_counts().reset_index()
     category_count_df = (
-        pd.DataFrame(category_count)
-        .rename(columns={"category": "count", "index": "category"})
-        .reset_index()
+        pd.DataFrame(category_count).rename(columns={"category": "count", "index": "category"}).reset_index()
     )
-    category_count_df["percentage"] = (
-        category_count_df["count"] / category_count_df["count"].sum() * 100
-    )
+    category_count_df["percentage"] = category_count_df["count"] / category_count_df["count"].sum() * 100
 
     fig = px.bar(
         category_count_df,

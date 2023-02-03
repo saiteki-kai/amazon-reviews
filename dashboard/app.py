@@ -7,7 +7,7 @@ from reviews.config import asum_output_dir
 external_stylesheets = [
     dbc.themes.LUX,
     dbc.icons.FONT_AWESOME,
-    "./assets/style.css",
+    # "./assets/style.css",
 ]
 
 app = Dash(
@@ -17,9 +17,7 @@ app = Dash(
 )
 
 data_df = pd.read_json(asum_output_dir / "reviews_sentiments.json.gz")
-data_df = data_df[
-    data_df["brand"].isin(list(data_df["brand"].value_counts()[:40].index))
-]
+data_df = data_df[data_df["brand"].isin(list(data_df["brand"].value_counts()[:40].index))]
 
 topic_set = {
     "?",

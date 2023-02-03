@@ -23,17 +23,11 @@ def plot_sentiment_over_time(period, brand, category, year):
     brand_df["period"] = brand_df["period"].dt.to_timestamp()
 
     sentiments_count = brand_df.groupby("period")["sentiment"].value_counts()
-    sentiments_df = (
-        pd.DataFrame(sentiments_count)
-        .rename(columns={"sentiment": "count"})
-        .reset_index()
-    )
+    sentiments_df = pd.DataFrame(sentiments_count).rename(columns={"sentiment": "count"}).reset_index()
     total_reviews = sentiments_df.groupby("period")["count"].sum().reset_index()
 
     sentiments_df = pd.merge(sentiments_df, total_reviews, on="period")
-    sentiments_df["percentage"] = (
-        sentiments_df["count_x"] / sentiments_df["count_y"] * 100
-    )
+    sentiments_df["percentage"] = sentiments_df["count_x"] / sentiments_df["count_y"] * 100
 
     fig = px.area(
         sentiments_df,

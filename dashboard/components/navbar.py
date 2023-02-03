@@ -6,9 +6,7 @@ from dashboard.app import data_df
 # Brand Select
 brand_select = dbc.Select(
     id="brand-select",
-    options=[
-        {"label": brand, "value": brand} for brand in list(data_df["brand"].unique())
-    ],
+    options=[{"label": brand, "value": brand} for brand in list(data_df["brand"].unique())],
     value="corsair",
     size="sm",
 )

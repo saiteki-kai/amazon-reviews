@@ -27,13 +27,7 @@ def clean_brand(x):
         return "unknown"
 
     x = x.lower()
-    x = (
-        x.replace("\n", "")
-        .replace(".", "")
-        .replace(",", "")
-        .replace("{", "")
-        .replace("}", "")
-    )
+    x = x.replace("\n", "").replace(".", "").replace(",", "").replace("{", "").replace("}", "")
     x = x.strip()
     x = remove_spaces(x)
     x = x.strip()
@@ -114,14 +108,8 @@ def remove_tokens_df(df, tokens: set, field="tokens", inplace=False):
 
     res = (
         df[field]
-        .apply(
-            lambda review: [
-                [t for t in sent if t not in tokens] for sent in review
-            ]  # keep words not in 'tokens'
-        )
-        .apply(  # remove empty sentences
-            lambda review: [sent for sent in review if sent]
-        )
+        .apply(lambda review: [[t for t in sent if t not in tokens] for sent in review])  # keep words not in 'tokens'
+        .apply(lambda review: [sent for sent in review if sent])  # remove empty sentences
     )
 
     if inplace:

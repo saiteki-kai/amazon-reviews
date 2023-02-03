@@ -22,12 +22,7 @@ def plot_reviews_over_time(period, brand, category, year):
     brand_df[period] = brand_df["timestamp"].dt.to_period(period)
     brand_df[period] = brand_df[period].dt.to_timestamp()
 
-    x = pd.DataFrame(
-        brand_df[period]
-        .value_counts()
-        .reset_index()
-        .rename(columns={"index": "period", period: "count"})
-    )
+    x = pd.DataFrame(brand_df[period].value_counts().reset_index().rename(columns={"index": "period", period: "count"}))
     x.sort_values(by="period", inplace=True)
 
     fig = px.area(

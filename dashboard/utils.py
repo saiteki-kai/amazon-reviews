@@ -1,7 +1,5 @@
 def update_brand(data_df, brand, category, year):
-    df = data_df[
-        (data_df["brand"] == brand) & (data_df["timestamp"].dt.year == int(year))
-    ].copy()
+    df = data_df[(data_df["brand"] == brand) & (data_df["timestamp"].dt.year == int(year))].copy()
 
     if category and category != "All":
         df = df[df["category"] == category].copy()

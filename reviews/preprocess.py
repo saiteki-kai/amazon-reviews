@@ -23,9 +23,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="bs4")
 # with open(data_dir / "stopwords", "r") as f:
 #    STOPWORDS2 = set([line.strip() for line in f.readlines()])
 
-STOPWORDS = set(spacy.load("en_core_web_sm").Defaults.stop_words).union(
-    stopwords.words("english")
-)
+STOPWORDS = set(spacy.load("en_core_web_sm").Defaults.stop_words).union(stopwords.words("english"))
 
 # Regular expressions
 
@@ -105,11 +103,7 @@ def strip_html(text: str):
 
 def remove_non_ascii(text: str):
     """Replace non-ASCII characters with ASCII ones."""
-    return (
-        unicodedata.normalize("NFKD", text)
-        .encode("ascii", "ignore")
-        .decode("utf-8", "ignore")
-    )
+    return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf-8", "ignore")
 
 
 def fix_punctuation(text: str):
@@ -247,10 +241,7 @@ def preprocess(
         ]
 
         if lemmatization:
-            sent_tags = [
-                [(w, get_wordnet_pos(tag)) for w, tag in tag_sent]
-                for tag_sent in pos_tag_sents(tokens)
-            ]
+            sent_tags = [[(w, get_wordnet_pos(tag)) for w, tag in tag_sent] for tag_sent in pos_tag_sents(tokens)]
 
             sent_tokens = []
             for tagged_sent in sent_tags:

@@ -6,14 +6,8 @@ from dashboard.utils import default_layout
 
 def category_sentiment_barplot(brand_df, order):
     sentiments_count = brand_df.groupby("category")["sentiment"].value_counts()
-    sentiments_count_perc = (
-        sentiments_count / sentiments_count.groupby("category").sum() * 100
-    )
-    sentiments_df_perc = (
-        pd.DataFrame(sentiments_count_perc)
-        .rename(columns={"sentiment": "percentage"})
-        .reset_index()
-    )
+    sentiments_count_perc = sentiments_count / sentiments_count.groupby("category").sum() * 100
+    sentiments_df_perc = pd.DataFrame(sentiments_count_perc).rename(columns={"sentiment": "percentage"}).reset_index()
     category_orders = {"sentiment": ["positive", "negative"]}
 
     fig = px.bar(

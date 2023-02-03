@@ -31,11 +31,7 @@ def topics_sentiment_barplot(brand_df, order):
     st_counts.sort_index(inplace=True)
     # st_counts = st_counts.iloc[[(o) for o in order][::-1]]
 
-    df_senti = (
-        st_counts.stack(level=0)
-        .reset_index()
-        .rename(columns={"level_1": "sentiment", 0: "percentage"})
-    )
+    df_senti = st_counts.stack(level=0).reset_index().rename(columns={"level_1": "sentiment", 0: "percentage"})
 
     category_orders = {"sentiment": ["positive", "negative"]}
 
