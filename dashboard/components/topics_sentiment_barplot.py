@@ -34,7 +34,7 @@ def topics_sentiment_barplot(brand_df, order):
     df_senti = (
         st_counts.stack(level=0)
         .reset_index()
-        .rename(columns={"level_1": "sentiment", 0: "count"})
+        .rename(columns={"level_1": "sentiment", 0: "percentage"})
     )
 
     category_orders = {"sentiment": ["positive", "negative"]}
@@ -42,7 +42,7 @@ def topics_sentiment_barplot(brand_df, order):
     fig = px.bar(
         df_senti,
         y="topic",
-        x="count",
+        x="percentage",
         color="sentiment",
         color_discrete_sequence=["#27d957", "#f54242"],
         barmode="relative",

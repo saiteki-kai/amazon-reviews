@@ -11,14 +11,14 @@ def category_sentiment_barplot(brand_df, order):
     )
     sentiments_df_perc = (
         pd.DataFrame(sentiments_count_perc)
-        .rename(columns={"sentiment": "count"})
+        .rename(columns={"sentiment": "percentage"})
         .reset_index()
     )
     category_orders = {"sentiment": ["positive", "negative"]}
 
     fig = px.bar(
         sentiments_df_perc,
-        x="count",
+        x="percentage",
         y="category",
         color="sentiment",
         color_discrete_sequence=["#27d957", "#f54242"],

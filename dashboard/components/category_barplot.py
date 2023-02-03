@@ -11,14 +11,19 @@ def category_barplot(brand_df, order):
         .rename(columns={"category": "count", "index": "category"})
         .reset_index()
     )
+    category_count_df["percentage"] = (
+        category_count_df["count"] / category_count_df["count"].sum() * 100
+    )
+
     fig = px.bar(
         category_count_df,
-        x="count",
+        x="percentage",
         y="category",
         color_discrete_sequence=[secondary_color],
         category_orders=order,
         title="Categories",
     )
     fig.update_layout(default_layout)
+    fig.update_xaxes(ticksuffix="%")
 
     return fig

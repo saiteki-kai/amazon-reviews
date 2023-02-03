@@ -18,15 +18,20 @@ def topics_barplot(brand_df):
     order = topics_count.sort_values(by="count", ascending=False)
     order = order.reset_index()["topic"]
 
-    fig1 = px.bar(
+    topics_count["percentage"] = (
+        topics_count["count"] / topics_count["count"].sum() * 100
+    )
+
+    fig = px.bar(
         topics_count,
         y="topic",
-        x="count",
+        x="percentage",
         color_discrete_sequence=[secondary_color],
         category_orders=dict(topic=order),
         title="Topics",
     )
 
-    fig1.update_layout(default_layout)
+    fig.update_layout(default_layout)
+    fig.update_xaxes(ticksuffix="%")
 
-    return fig1, order
+    return fig, order

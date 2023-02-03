@@ -42,7 +42,7 @@ def plot_reviews_over_time(period, brand, category, year):
     fig.update_layout(default_layout)
     fig.update_layout(legend_orientation="v", margin=dict(t=40))
     fig.update_xaxes(dtick="M1", tickformat="%b")
-    fig.update_yaxes(title_text="% Reviews")
+    fig.update_yaxes(title_text="# Reviews")
 
     return fig
 
