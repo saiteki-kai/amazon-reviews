@@ -1,17 +1,13 @@
-from math import floor
-
 import dash
 import dash_bootstrap_components as dbc
 from dash import ALL, Input, Output, dcc, html
 
 from dashboard.app import data_df
-from dashboard.components.reviews_rating import reviews_rating
-from dashboard.components.sentiment_piechart import sentiment_piechart
 from dashboard.components.topics_barplot import topics_barplot
 from dashboard.components.topics_sentiment_barplot import topics_sentiment_barplot
+from dashboard.pages.products.components.item_list import item_list
+from dashboard.pages.products.components.product_details import get_details
 from dashboard.utils import update_brand
-
-tmp_id = "B00L64NSL2"
 
 
 @dash.callback(
@@ -36,130 +32,55 @@ def set_active(product_clicks, product_ids):
 
 
 @dash.callback(
-    Output("star_distribution", "figure"),
-    Output("round", "figure"),
     Output("topics1", "figure"),
     Output("topics2", "figure"),
+    Output("product-details", "children"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
     Input("year-select", "value"),
     Input({"type": "item", "asin": ALL}, "n_clicks"),
 )
-def dynamic_page(brand, category, year, product_ids):
+def update_page(brand, category, year, product_ids):
     brand_df = update_brand(data_df, brand, category, year)
 
+    selected_asin = None
     if not all([prod is None for prod in product_ids]):
-        selected_asin = dash.callback_context.triggered_id["asin"]
-        brand_df = brand_df[brand_df["asin"] == selected_asin]
-        print("Selected ASIN:", selected_asin)
+        if "asin" in dash.callback_context.triggered_id:
+            selected_asin = dash.callback_context.triggered_id["asin"]
+            brand_df = brand_df[brand_df["asin"] == selected_asin]
+            print("Selected ASIN:", selected_asin)
 
-    fig1 = reviews_rating(brand_df)
-    fig2 = sentiment_piechart(brand_df)
-    fig3, order = topics_barplot(brand_df)
-    fig4 = topics_sentiment_barplot(brand_df, order)
+    fig1, order = topics_barplot(brand_df)
+    fig2 = topics_sentiment_barplot(brand_df, order)
 
-    return fig1, fig2, fig3, fig4
+    details = get_details(selected_asin)
 
+    return fig1, fig2, details
 
-PAGE_SIZE = 5
-
-
-def row_item(row):
-    return dbc.ListGroupItem(
-        row.title,
-        id={"type": "item", "asin": row.asin},
-        action=True,
-        # active=True
-    )
-
-
-@dash.callback(
-    Output("items", "children"),
-    Output("pagination", "max_value"),
-    Output("total", "children"),
-    Input("pagination", "active_page"),
-    Input("brand-select", "value"),
-    Input("category-select", "value"),
-    Input("year-select", "value"),
-)
-def update_table(page, brand, category, year):
-    brand_df = update_brand(data_df, brand, category, year)
-    brand_df = brand_df.drop_duplicates(["asin"])
-
-    if not page:
-        page = 1
-
-    page_idx = page - 1
-
-    start = page_idx * PAGE_SIZE
-    end = (page_idx + 1) * PAGE_SIZE
-
-    total = floor(len(brand_df) / PAGE_SIZE)
-
-    return (
-        brand_df.iloc[start:end].apply(row_item, axis=1),
-        total,
-        f"Showing {PAGE_SIZE} items out of {total} results",
-    )
-
-
-item_list = html.Div(
-    id="item-list",
-    children=[
-        dbc.CardBody(
-            [
-                dbc.ListGroup(id="items"),
-            ],
-        ),
-        dbc.CardFooter(
-            className="py-2 mx-2",
-            children=[
-                html.Small(
-                    id="total",
-                    className="text-muted",
-                ),
-                dbc.Pagination(
-                    id="pagination",
-                    max_value=0,
-                    fully_expanded=False,
-                    previous_next=True,
-                ),
-            ],
-        ),
-    ],
-)
 
 layout = html.Div(
     dbc.Row(
         [
             dbc.Col(
-                html.Div(className="panel", children=item_list),
+                html.Div(
+                    item_list,
+                    className="panel p-0",
+                ),
                 className="h-100",
-                width=4,
+                width=3,
             ),
             dbc.Col(
                 [
-                    dbc.Row(
-                        dbc.Col(
-                            html.Div(
-                                id="star_distribution",
-                                className="panel",
-                            ),
-                            className="row-50",
+                    html.Div(
+                        html.Div(
+                            id="product-details",
+                            className="h-100",
                         ),
-                    ),
-                    dbc.Row(
-                        dbc.Col(
-                            html.Div(
-                                dcc.Graph(id="round"),
-                                className="panel",
-                            )
-                        ),
-                        className="row-50",
+                        className="panel",
                     ),
                 ],
                 className="h-100",
-                width=4,
+                width=5,
             ),
             dbc.Col(
                 [
@@ -190,35 +111,3 @@ layout = html.Div(
     ),
     className="page-container",
 )
-
-# @dash.callback(
-#     Output("group_list", "children"),
-#     Input("brand-select", "value"),
-#     Input("category-select", "value"),
-# )
-# def update_plot(brand, category):
-#     #update graph brand
-#     brand_df = update_brand(data_df, brand, category)
-
-#     element = []
-#     for _, row in brand_df.iterrows():
-#         element.append(dbc.ListGroupItem([
-#             html.Div([
-#                 html.Small(row.title),
-#                 html.Small("Yay!", className="text-success"),
-#             ]),
-#             html.H5("ciao, seconda riga"),
-#         ]))
-
-#     return element
-
-# table_header = html.Thead(
-#     html.Tr(
-#         [
-#             html.Th("Text"),
-#             html.Th("Vote", style={"width": "15%"}),
-#             html.Th("Sentiment", style={"width": "15%"}),
-#             html.Th("Topics", style={"width": "15%"}),
-#         ],
-#     ),
-# )
