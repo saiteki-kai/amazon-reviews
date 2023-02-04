@@ -134,10 +134,10 @@ def get_wordnet_pos(treebank_tag):
 def normalize(
     tokens,
     tags=None,
-    lowercase=True,
     lemmatization=True,
     stemming=False,
     remove_stopwords=True,
+    negate=True,
 ):
     if lemmatization and stemming:
         raise ValueError(
@@ -158,9 +158,6 @@ def normalize(
         if len(token) < 2 or stopwords_condition:
             continue
 
-        if lowercase:
-            token = token.lower()
-
         if lemmatization:
             pos = tags[i]
             token = wnl.lemmatize(token, pos)
@@ -173,7 +170,7 @@ def normalize(
             continue
 
         if 1 < len(token) < 20:
-            if negs[i]:
+            if negs[i] and negate:
                 token = "not_" + token
 
             normalized_tokens.append(token)
@@ -227,11 +224,15 @@ def preprocess(
     return_tokens=True,
     split_commas=False,
     split_conjunctions=False,
+    negate=True,
 ):
     text = clean_text(text)
 
+    if lowercase:
+        text = text.lower()
+
     if split_conjunctions:
-        text = CONJ_RE.sub(". ", text)  # split adversative conjunctions
+        text = CONJ_RE.sub(". not ", text)  # split adversative conjunctions
 
     if sentences:
         tokens = [
@@ -252,10 +253,10 @@ def preprocess(
                 normalized_tokens = normalize(
                     tokens,
                     tags=tags,
-                    lowercase=lowercase,
                     lemmatization=lemmatization,
                     stemming=stemming,
                     remove_stopwords=remove_stopwords,
+                    negate=negate,
                 )
 
                 if len(normalized_tokens) > 0:
@@ -266,10 +267,10 @@ def preprocess(
             for sent_token in tokens:
                 normalized_tokens = normalize(
                     sent_token,
-                    lowercase=lowercase,
                     lemmatization=lemmatization,
                     stemming=stemming,
                     remove_stopwords=remove_stopwords,
+                    negate=negate,
                 )
                 if len(normalized_tokens) > 0:
                     sent_tokens.append(normalized_tokens)
@@ -291,10 +292,10 @@ def preprocess(
     normalized_tokens = normalize(
         tokens,
         tags,
-        lowercase=lowercase,
         lemmatization=lemmatization,
         stemming=stemming,
         remove_stopwords=remove_stopwords,
+        negate=negate,
     )
 
     if return_tokens:
