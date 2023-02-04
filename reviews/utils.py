@@ -124,6 +124,9 @@ def preprocess_df(
     parallel=True,
     normalize=None,
     remove_stopwords=None,
+    split_conjunctions=None,
+    split_commas=None,
+    negate_tokens=True,
     save=True,
     out_dir="",
     verbose=True,
@@ -137,6 +140,14 @@ def preprocess_df(
 
     if remove_stopwords is not None:
         args["remove_stopwords"] = remove_stopwords
+
+    if split_conjunctions is not None:
+        args["split_conjunctions"] = split_conjunctions
+
+    if split_commas is not None:
+        args["split_commas"] = split_commas
+
+    args["negate"] = negate_tokens
 
     if not inplace:
         df = df.copy()
@@ -175,6 +186,12 @@ def preprocess_df(
         print(f"Empty Docs: {empty_docs.sum() / len(df) * 100:.2f}%")
 
     if save and normalize is not None:
-        df.to_json(Path(out_dir) / f"reviews_{field}_{normalize}.json.gz")
+        extra = ""
+        if split_conjunctions:
+            extra = "_conj"
+            if split_commas:
+                extra = "_comma"
+
+        df.to_json(Path(out_dir) / f"reviews_{field}_{normalize}{extra}.json.gz")
 
     return df
