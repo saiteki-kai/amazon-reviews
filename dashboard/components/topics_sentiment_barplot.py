@@ -20,7 +20,9 @@ def topics_sentiment_barplot(brand_df, order):
     pos_df = pd.DataFrame(pos_count.items(), columns=["topic", "positive"])
     neg_df = pd.DataFrame(neg_count.items(), columns=["topic", "negative"])
 
-    st_counts = pd.merge(pos_df, neg_df, on="topic")
+    st_counts = pd.merge(pos_df, neg_df, on="topic", how="outer")
+    st_counts.fillna(0, inplace=True)
+
     st_counts["topic"] = st_counts["topic"].astype("category")
 
     total = st_counts["positive"] + st_counts["negative"]
@@ -29,11 +31,10 @@ def topics_sentiment_barplot(brand_df, order):
 
     st_counts.set_index("topic", inplace=True)
     st_counts.sort_index(inplace=True)
-    # st_counts = st_counts.iloc[[(o) for o in order][::-1]]
 
     df_senti = st_counts.stack(level=0).reset_index().rename(columns={"level_1": "sentiment", 0: "percentage"})
 
-    category_orders = {"sentiment": ["positive", "negative"]}
+    category_orders = {"sentiment": ["positive", "negative"], "topic": order}
 
     fig = px.bar(
         df_senti,
