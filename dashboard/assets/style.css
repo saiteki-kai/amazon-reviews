@@ -165,8 +165,12 @@ i.fa-solid, i.fa-regular {
 
 /* comparison Page -------------------------------------------------------------------------------------------------- */
 
-#row1, #row2 {
-    height: 50%;
+#row-c1 {
+  height: 10%;
+}
+
+#row-c2, #row-c3 {
+    height: calc((100% - 10%) / 2)
 }
 
 #topic_sentiment {

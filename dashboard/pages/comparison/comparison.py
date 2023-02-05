@@ -7,87 +7,56 @@ import plotly.express as px
 from dash import Input, Output, dcc, html
 
 from dashboard.app import data_df, topic_set
+from dashboard.utils import default_layout
+from dashboard.pages.comparison.panels.topic_comparison import sentiment_aspect_df, topic_comparison
 
 
-@dash.callback(
-    Output("topic_dropdown", "options"),
-    Output("topic_dropdown", "value"),
-    Input("category-select", "value"),
-)
-def update_category(category):
-    opt = [{"label": f"{i}", "value": f"{i}"} for i in topic_set]
-    return opt, opt[0]["value"]
 
-
-def global_sentiment_barplot(brand, competitors, competitors_df):
+def global_sentiment_barplot(sentiment_df_perc, competitors, colors):
     # global sentiment
-    sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
-    sentiment_df_perc = sentiment_df / sentiment_df.groupby("brand").sum()
-    sentiment_df_perc = pd.DataFrame(sentiment_df_perc * 100).rename(columns={"sentiment": "count"}).reset_index()
-
     fig2 = px.bar(
         sentiment_df_perc,
-        x="brand",
-        y="count",
-        color="sentiment",
+        y="brand",
+        x="count",
+        color="brand",
         barmode="relative",
-        category_orders=dict(brand=[brand, *competitors]),
+        color_discrete_sequence=colors,
+        category_orders=dict(brand=competitors),
+        title="Sentiment By Brand",
     )
-    fig2.update_xaxes(showgrid=False, title_text="")
-    fig2.update_yaxes(showgrid=False, title_text="", showticklabels=False)
-    fig2.update_layout(margin=dict(l=0, t=0, r=0, b=0))
+    fig2.update_layout(default_layout)
+    fig2.update_layout(legend_orientation="v")
+    fig2.update_xaxes(title_text="", ticksuffix="%")
+    fig2.update_yaxes(title_text="")
     return fig2
 
 
-def positive_sentiment_overtime_plot(period, competitors_df):
+def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors):
     # positive sentiment in time
-    competitors_df[period] = competitors_df["timestamp"].dt.to_period(period)
-    competitors_df[period] = competitors_df[period].dt.to_timestamp()
+    competitors_df["period"] = competitors_df["timestamp"].copy().dt.to_period(period)
+    competitors_df["period"] = competitors_df["period"].dt.to_timestamp()
 
-    sentiments_count = (
-        competitors_df[competitors_df["sentiment"] == "positive"].groupby([period, "brand"])["sentiment"].value_counts()
-    )
+    sentiments_count = competitors_df.groupby(["period", "brand"])["sentiment"].value_counts()
     sentiments_df = pd.DataFrame(sentiments_count).rename(columns={"sentiment": "count"}).reset_index()
+    total_reviews = sentiments_df.groupby(["period", "brand"])["count"].sum().reset_index()
+
+    sentiments_df = pd.merge(sentiments_df, total_reviews, on=["period", "brand"])
+    sentiments_df["percentage"] = sentiments_df["count_x"] / sentiments_df["count_y"] * 100
 
     fig3 = px.line(
-        sentiments_df,
-        x=period,
-        y="count",
+        sentiments_df[sentiments_df['sentiment'] == 'positive'],
+        x="period",
+        y="percentage",
         color="brand",
-        # title="Sentiment Over Time",
+        markers=True,
+        category_orders=dict(brand=[brand, *competitors]),
+        color_discrete_sequence=plotly_colors,
+        title="Sentiment Over Time By Brand",
     )
-    fig3.update_xaxes(
-        showgrid=False,
-        title_text="",
-        # range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
-    )
-    fig3.update_yaxes(showgrid=False, title_text="# Reviews")
-    fig3.update_layout({"margin": dict(l=0, r=0, b=0)})
+    fig3.update_layout(default_layout)
+    fig3.update_xaxes(showgrid=False, title_text="")
+    fig3.update_yaxes(showgrid=False, title_text="% Reviews", ticksuffix="%")
     return fig3
-
-
-def negative_sentiment_overtime_plot(period, competitors_df):
-    # negative sentiment in time
-    sentiments_count = (
-        competitors_df[competitors_df["sentiment"] == "negative"].groupby([period, "brand"])["sentiment"].value_counts()
-    )
-    sentiments_df = pd.DataFrame(sentiments_count).rename(columns={"sentiment": "count"}).reset_index()
-
-    fig4 = px.line(
-        sentiments_df,
-        x=period,
-        y="count",
-        color="brand",
-        # title="Sentiment Over Time",
-    )
-    fig4.update_xaxes(
-        showgrid=False,
-        title_text="",
-        # range=list(map(lambda x: datetime.datetime(x, 1, 1), years)),
-    )
-    fig4.update_yaxes(showgrid=False, title_text="# Reviews")
-    fig4.update_layout({"margin": dict(l=0, r=0, b=0)})
-    return fig4
 
 
 def sentiment_topic_plot(brand, competitors, competitors_df):
@@ -137,37 +106,73 @@ def sentiment_topic_plot(brand, competitors, competitors_df):
     fig5.update_xaxes(showgrid=False, title_text="")
     fig5.update_yaxes(showgrid=False, title_text="", showticklabels=False)
     fig5.update_layout(margin=dict(l=0, t=0, r=0, b=0))
+    
     return fig5
 
 
 @dash.callback(
     Output("global_sentiment", "figure"),
     Output("time_brand_pos_sentiment", "figure"),
-    Output("time_brand_neg_sentiment", "figure"),
-    Output("topic_sentiment", "figure"),
+    Output("brand_topics_1", "figure"),
+    Output("brand_topics_2", "figure"),
+    Output("brand_topics_3", "figure"),
+    Output("brand_topics_4", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
-    Input("topic_dropdown", "value"),
 )
-def update_plot(brand, category, topic):
+def update_plot(brand, category):
+    # costant parameters
+    period = "Y"
+    n_brand_to_keep = 4
+
+    # update dataframe based on brand, category and year
     category_df = data_df[data_df["category"] == category]
     category_df = category_df[category_df["brand"] != brand]
 
-    period = "Y"
+    # competitors selection by # of reviews
+    competitors = list(category_df["brand"].value_counts().index)[:n_brand_to_keep]
 
-    # competitors
-    competitors = list(category_df["brand"].value_counts().index)[:5] + [brand]
+    if brand not in competitors:
+        competitors.pop()
+
+    competitors = [brand] + competitors
     competitors_df = data_df[data_df["brand"].isin(competitors)]
 
-    fig2 = global_sentiment_barplot(brand, competitors, competitors_df)
-    fig3 = positive_sentiment_overtime_plot(period, competitors_df)
-    fig4 = negative_sentiment_overtime_plot(period, competitors_df)
-    fig5 = sentiment_topic_plot(brand, competitors, competitors_df)
-    return fig2, fig3, fig4, fig5
+    # sentiment perc
+    sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
+    sentiment_df_perc = sentiment_df / sentiment_df.groupby("brand").sum()
+    sentiment_df_perc = pd.DataFrame(sentiment_df_perc * 100).rename(columns={"sentiment": "count"}).reset_index()
+    sentiment_df_perc = sentiment_df_perc[sentiment_df_perc['sentiment'] == 'positive']
+
+    # sort competitors by positive sentiment perc
+    competitors = list(sentiment_df_perc.sort_values(by='count', ascending=False)["brand"])
+
+    # choose colors for competitors
+    plotly_colors = ["#ECE81A", "#b5b4b1", "#8c8c8b", "#737372"]
+
+    # comperison plots
+    fig1 = global_sentiment_barplot(sentiment_df_perc, competitors, plotly_colors)
+    fig2 = positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors)
+
+    topics = list(set(sentiment_aspect_df(competitors_df)["topic"].unique()))
+    figures = []
+    for i, competitor in enumerate(competitors):
+        figures.append(topic_comparison(competitors_df, competitor, plotly_colors[i], topics))
+
+    return fig1, fig2, *figures
+
 
 
 layout = html.Div(
     [
+        dbc.Row(
+            dbc.Col(
+                html.Div(className="panel"),
+                className="h-100",
+            ),
+            id="row-c1",
+            className="g-0",
+        ),
         dbc.Row(
             [
                 dbc.Col(
@@ -179,42 +184,47 @@ layout = html.Div(
                 ),
                 dbc.Col(
                     html.Div(
-                        [
-                            dcc.Dropdown(
-                                id="topic_dropdown",
-                                options=[""],
-                                placeholder="select topic",
-                                value="Gold",
-                                clearable=False,
-                            ),
-                            dcc.Graph(id="topic_sentiment"),
-                        ],
+                        dcc.Graph(id="time_brand_pos_sentiment"),
                         className="panel",
                     ),
                     className="h-100",
                 ),
             ],
-            id="row1",
+            id="row-c2",
             className="g-0",
         ),
         dbc.Row(
             [
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="time_brand_pos_sentiment"),
+                        dcc.Graph(id="brand_topics_1"),
                         className="panel",
                     ),
                     className="h-100",
                 ),
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="time_brand_neg_sentiment"),
+                        dcc.Graph(id="brand_topics_2"),
+                        className="panel",
+                    ),
+                    className="h-100",
+                ),
+                dbc.Col(
+                    html.Div(
+                        dcc.Graph(id="brand_topics_3"),
+                        className="panel",
+                    ),
+                    className="h-100",
+                ),
+                dbc.Col(
+                    html.Div(
+                        dcc.Graph(id="brand_topics_4"),
                         className="panel",
                     ),
                     className="h-100",
                 ),
             ],
-            id="row2",
+            id="row-c3",
             className="g-0",
         ),
     ],
