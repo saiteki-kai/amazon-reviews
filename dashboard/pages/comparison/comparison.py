@@ -9,7 +9,7 @@ from dash import Input, Output, dcc, html
 from dashboard.app import data_df, topic_set
 from dashboard.utils import default_layout
 from dashboard.pages.comparison.panels.topic_comparison import sentiment_aspect_df, topic_comparison
-
+from dashboard.utils import primary_color, secondary_color
 
 
 def global_sentiment_barplot(sentiment_df_perc, competitors, colors):
@@ -49,7 +49,7 @@ def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period,
         y="percentage",
         color="brand",
         markers=True,
-        category_orders=dict(brand=[brand, *competitors]),
+        category_orders=dict(brand=competitors),
         color_discrete_sequence=plotly_colors,
         title="Sentiment Over Time By Brand",
     )
@@ -154,7 +154,11 @@ def update_plot(brand, category, sentiment):
     competitors = list(sentiment_df_perc.sort_values(by='count', ascending=False)["brand"])
 
     # choose colors for competitors
-    plotly_colors = ["#ECE81A", "#b5b4b1", "#8c8c8b", "#737372"]
+    plotly_colors = [secondary_color, "#b5b4b1", "#8c8c8b", "#737372"]
+
+    # replace brand color
+    brand_index = competitors.index(brand)
+    plotly_colors[brand_index] = primary_color
 
     # comperison plots
     fig1 = global_sentiment_barplot(sentiment_df_perc, competitors, plotly_colors)
