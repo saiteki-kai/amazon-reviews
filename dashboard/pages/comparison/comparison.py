@@ -124,27 +124,23 @@ def sentiment_topic_plot(brand, competitors, competitors_df):
 def update_plot(brand, category, sentiment):
     # costant parameters
     period = "Y"
-    n_brand_to_keep = 4
+    n_brand_to_keep = 3
 
     # update dataframe based on category
     category_df = data_df[data_df["category"] == category]
 
-    # update dataframe based on brand
-    category_df = category_df[category_df["brand"] != brand]
+    # brand competitors in the specified category 
+    competitors_df = category_df[category_df["brand"] != brand]
 
     # update sentiment selection
     sentiment_selected = 'positive' if sentiment else 'negative'
 
-    # competitors selection by # of reviews
-    competitors = list(category_df["brand"].value_counts().index)[:n_brand_to_keep]
-
-    if brand not in competitors:
-        competitors.pop()
-
+    # competitors selection by # of reviews and add brand
+    competitors = list(competitors_df["brand"].value_counts().index)[:n_brand_to_keep]
     competitors = [brand] + competitors
-    competitors_df = data_df[data_df["brand"].isin(competitors)]
+    competitors_df = category_df[category_df["brand"].isin(competitors)]
 
-    # sentiment perc
+    # compute sentiment perc for the competitors
     sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
     sentiment_df_perc = sentiment_df / sentiment_df.groupby("brand").sum()
     sentiment_df_perc = pd.DataFrame(sentiment_df_perc * 100).rename(columns={"sentiment": "count"}).reset_index()
