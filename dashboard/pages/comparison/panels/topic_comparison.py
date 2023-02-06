@@ -92,18 +92,20 @@ def sentiment_aspect_df(reviews_df):
     df_senti = st_counts.stack(level=0).reset_index().rename(columns={"level_1": "sentiment", 0: "count"})
     return df_senti
 
-def get_topics_score_by_brand(brand_competitor, competitors_df):
+def get_topics_score_by_brand(brand_competitor, competitors_df, sentiment_selected):
     df2 = competitors_df[competitors_df["brand"] == brand_competitor].copy()
     df2 = sentiment_aspect_df(df2)
     df2["count"] = df2["count"].astype(int)
-    
-    return df2[df2["sentiment"] == "neg"]["count"].to_list()
 
-def topic_comparison(competitors_df, competitor, color, topics):
+    # sentiment_selected is 'positive' or 'negative'
+    # but df2 contains 'pos' or 'neg' so sentiment_selected[:3]
+    return df2[df2["sentiment"] == sentiment_selected[:3]]["count"].to_list()
+
+def topic_comparison(competitors_df, competitor, color, topics, sentiment_selected):
     topics = topics[:10]  # momentaneo!!!
     topics.append(topics[0])
 
-    values = get_topics_score_by_brand(competitor, competitors_df)[:10]
+    values = get_topics_score_by_brand(competitor, competitors_df, sentiment_selected)[:10] # momentaneo!!!
     values.append(values[0])
 
     fig = go.Figure(

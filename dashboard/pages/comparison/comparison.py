@@ -31,7 +31,7 @@ def global_sentiment_barplot(sentiment_df_perc, competitors, colors):
     return fig2
 
 
-def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors):
+def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors, sentiment_selected):
     # positive sentiment in time
     competitors_df["period"] = competitors_df["timestamp"].copy().dt.to_period(period)
     competitors_df["period"] = competitors_df["period"].dt.to_timestamp()
@@ -44,7 +44,7 @@ def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period,
     sentiments_df["percentage"] = sentiments_df["count_x"] / sentiments_df["count_y"] * 100
 
     fig3 = px.line(
-        sentiments_df[sentiments_df['sentiment'] == 'positive'],
+        sentiments_df[sentiments_df['sentiment'] == sentiment_selected],
         x="period",
         y="percentage",
         color="brand",
@@ -119,15 +119,21 @@ def sentiment_topic_plot(brand, competitors, competitors_df):
     Output("brand_topics_4", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
+    Input("sentiment-switch", "value"),
 )
-def update_plot(brand, category):
+def update_plot(brand, category, sentiment):
     # costant parameters
     period = "Y"
     n_brand_to_keep = 4
 
-    # update dataframe based on brand, category and year
+    # update dataframe based on category
     category_df = data_df[data_df["category"] == category]
+
+    # update dataframe based on brand
     category_df = category_df[category_df["brand"] != brand]
+
+    # update sentiment selection
+    sentiment_selected = 'positive' if sentiment else 'negative'
 
     # competitors selection by # of reviews
     competitors = list(category_df["brand"].value_counts().index)[:n_brand_to_keep]
@@ -142,7 +148,7 @@ def update_plot(brand, category):
     sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
     sentiment_df_perc = sentiment_df / sentiment_df.groupby("brand").sum()
     sentiment_df_perc = pd.DataFrame(sentiment_df_perc * 100).rename(columns={"sentiment": "count"}).reset_index()
-    sentiment_df_perc = sentiment_df_perc[sentiment_df_perc['sentiment'] == 'positive']
+    sentiment_df_perc = sentiment_df_perc[sentiment_df_perc['sentiment'] == sentiment_selected]
 
     # sort competitors by positive sentiment perc
     competitors = list(sentiment_df_perc.sort_values(by='count', ascending=False)["brand"])
@@ -152,22 +158,36 @@ def update_plot(brand, category):
 
     # comperison plots
     fig1 = global_sentiment_barplot(sentiment_df_perc, competitors, plotly_colors)
-    fig2 = positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors)
+    fig2 = positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors, sentiment_selected)
 
     topics = list(set(sentiment_aspect_df(competitors_df)["topic"].unique()))
     figures = []
     for i, competitor in enumerate(competitors):
-        figures.append(topic_comparison(competitors_df, competitor, plotly_colors[i], topics))
+        figures.append(topic_comparison(competitors_df, competitor, plotly_colors[i], topics, sentiment_selected))
 
     return fig1, fig2, *figures
 
-
+@dash.callback(
+    Output("sentiment-switch", "label"),
+    [
+        Input("sentiment-switch", "value"),
+    ],
+)
+def on_sentiment_switch_change(sentiment_checked):
+    if sentiment_checked:
+        return 'Positive Sentiment'
+    else:
+        return 'Negative Sentiment'
 
 layout = html.Div(
     [
         dbc.Row(
             dbc.Col(
-                html.Div(className="panel"),
+                dbc.Switch(
+                    id="sentiment-switch",
+                    label="Positive Sentiment",
+                    value=True,
+                ),
                 className="h-100",
             ),
             id="row-c1",
