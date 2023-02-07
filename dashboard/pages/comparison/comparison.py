@@ -6,10 +6,12 @@ import pandas as pd
 import plotly.express as px
 from dash import Input, Output, dcc, html
 
-from dashboard.app import data_df, topic_set
-from dashboard.utils import default_layout
-from dashboard.pages.comparison.panels.topic_comparison import sentiment_aspect_df, topic_comparison
-from dashboard.utils import primary_color, secondary_color
+from dashboard.app import data_df
+from dashboard.pages.comparison.panels.topic_comparison import (
+    sentiment_aspect_df,
+    topic_comparison,
+)
+from dashboard.utils import default_layout, primary_color, secondary_color
 
 
 def global_sentiment_barplot(sentiment_df_perc, competitors, colors):
@@ -33,20 +35,21 @@ def global_sentiment_barplot(sentiment_df_perc, competitors, colors):
 
 def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors, sentiment_selected):
     # positive sentiment in time
-    competitors_df["period"] = competitors_df["timestamp"].copy().dt.to_period(period)
+    competitors_df = competitors_df.copy()
+    competitors_df["period"] = competitors_df["timestamp"].dt.to_period(period)
     competitors_df["period"] = competitors_df["period"].dt.to_timestamp()
 
     sentiments_count = competitors_df.groupby(["period", "brand"])["sentiment"].value_counts()
     sentiments_df = pd.DataFrame(sentiments_count).rename(columns={"sentiment": "count"}).reset_index()
-    total_reviews = sentiments_df.groupby(["period", "brand"])["count"].sum().reset_index()
+    # total_reviews = sentiments_df.groupby(["period", "brand"])["count"].sum().reset_index()
 
-    sentiments_df = pd.merge(sentiments_df, total_reviews, on=["period", "brand"])
-    sentiments_df["percentage"] = sentiments_df["count_x"] / sentiments_df["count_y"] * 100
+    # sentiments_df = pd.merge(sentiments_df, total_reviews, on=["period", "brand"])
+    # sentiments_df["percentage"] = sentiments_df["count_x"] / sentiments_df["count_y"] * 100
 
     fig3 = px.line(
-        sentiments_df[sentiments_df['sentiment'] == sentiment_selected],
+        sentiments_df[sentiments_df["sentiment"] == sentiment_selected],
         x="period",
-        y="percentage",
+        y="count",
         color="brand",
         markers=True,
         category_orders=dict(brand=competitors),
@@ -55,7 +58,7 @@ def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period,
     )
     fig3.update_layout(default_layout)
     fig3.update_xaxes(showgrid=False, title_text="")
-    fig3.update_yaxes(showgrid=False, title_text="% Reviews", ticksuffix="%")
+    fig3.update_yaxes(showgrid=False, title_text="# Reviews")  # , ticksuffix="%")
     return fig3
 
 
@@ -106,7 +109,7 @@ def sentiment_topic_plot(brand, competitors, competitors_df):
     fig5.update_xaxes(showgrid=False, title_text="")
     fig5.update_yaxes(showgrid=False, title_text="", showticklabels=False)
     fig5.update_layout(margin=dict(l=0, t=0, r=0, b=0))
-    
+
     return fig5
 
 
@@ -129,11 +132,11 @@ def update_plot(brand, category, sentiment):
     # update dataframe based on category
     category_df = data_df[data_df["category"] == category]
 
-    # brand competitors in the specified category 
+    # brand competitors in the specified category
     competitors_df = category_df[category_df["brand"] != brand]
 
     # update sentiment selection
-    sentiment_selected = 'positive' if sentiment else 'negative'
+    sentiment_selected = "positive" if sentiment else "negative"
 
     # competitors selection by # of reviews and add brand
     competitors = list(competitors_df["brand"].value_counts().index)[:n_brand_to_keep]
@@ -144,10 +147,10 @@ def update_plot(brand, category, sentiment):
     sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
     sentiment_df_perc = sentiment_df / sentiment_df.groupby("brand").sum()
     sentiment_df_perc = pd.DataFrame(sentiment_df_perc * 100).rename(columns={"sentiment": "count"}).reset_index()
-    sentiment_df_perc = sentiment_df_perc[sentiment_df_perc['sentiment'] == sentiment_selected]
+    sentiment_df_perc = sentiment_df_perc[sentiment_df_perc["sentiment"] == sentiment_selected]
 
     # sort competitors by positive sentiment perc
-    competitors = list(sentiment_df_perc.sort_values(by='count', ascending=False)["brand"])
+    competitors = list(sentiment_df_perc.sort_values(by="count", ascending=False)["brand"])
 
     # choose colors for competitors
     plotly_colors = [secondary_color, "#b5b4b1", "#8c8c8b", "#737372"]
@@ -158,7 +161,9 @@ def update_plot(brand, category, sentiment):
 
     # comperison plots
     fig1 = global_sentiment_barplot(sentiment_df_perc, competitors, plotly_colors)
-    fig2 = positive_sentiment_overtime_plot(brand, competitors, competitors_df, period, plotly_colors, sentiment_selected)
+    fig2 = positive_sentiment_overtime_plot(
+        brand, competitors, competitors_df, period, plotly_colors, sentiment_selected
+    )
 
     topics = list(set(sentiment_aspect_df(competitors_df)["topic"].unique()))
     figures = []
@@ -166,6 +171,7 @@ def update_plot(brand, category, sentiment):
         figures.append(topic_comparison(competitors_df, competitor, plotly_colors[i], topics, sentiment_selected))
 
     return fig1, fig2, *figures
+
 
 @dash.callback(
     Output("sentiment-switch", "label"),
@@ -175,9 +181,10 @@ def update_plot(brand, category, sentiment):
 )
 def on_sentiment_switch_change(sentiment_checked):
     if sentiment_checked:
-        return 'Positive Sentiment'
+        return "Positive Sentiment"
     else:
-        return 'Negative Sentiment'
+        return "Negative Sentiment"
+
 
 layout = html.Div(
     [
@@ -197,14 +204,14 @@ layout = html.Div(
             [
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="global_sentiment"),
+                        dcc.Graph(id="global_sentiment", config={"displayModeBar": False}),
                         className="panel",
                     ),
                     className="h-100",
                 ),
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="time_brand_pos_sentiment"),
+                        dcc.Graph(id="time_brand_pos_sentiment", config={"displayModeBar": False}),
                         className="panel",
                     ),
                     className="h-100",
@@ -217,28 +224,28 @@ layout = html.Div(
             [
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="brand_topics_1"),
+                        dcc.Graph(id="brand_topics_1", config={"displayModeBar": False}),
                         className="panel",
                     ),
                     className="h-100",
                 ),
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="brand_topics_2"),
+                        dcc.Graph(id="brand_topics_2", config={"displayModeBar": False}),
                         className="panel",
                     ),
                     className="h-100",
                 ),
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="brand_topics_3"),
+                        dcc.Graph(id="brand_topics_3", config={"displayModeBar": False}),
                         className="panel",
                     ),
                     className="h-100",
                 ),
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="brand_topics_4"),
+                        dcc.Graph(id="brand_topics_4", config={"displayModeBar": False}),
                         className="panel",
                     ),
                     className="h-100",

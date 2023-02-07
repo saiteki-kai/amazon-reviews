@@ -1,9 +1,9 @@
 from collections import Counter
-import plotly.express as px
+
 import pandas as pd
 import plotly.graph_objects as go
-from dashboard.utils import primary_color, secondary_color, default_layout
 
+from dashboard.utils import default_layout
 
 
 def sentiment_aspect_df(reviews_df):
@@ -92,6 +92,7 @@ def sentiment_aspect_df(reviews_df):
     df_senti = st_counts.stack(level=0).reset_index().rename(columns={"level_1": "sentiment", 0: "count"})
     return df_senti
 
+
 def get_topics_score_by_brand(brand_competitor, competitors_df, sentiment_selected):
     df2 = competitors_df[competitors_df["brand"] == brand_competitor].copy()
     df2 = sentiment_aspect_df(df2)
@@ -101,31 +102,31 @@ def get_topics_score_by_brand(brand_competitor, competitors_df, sentiment_select
     # but df2 contains 'pos' or 'neg' so sentiment_selected[:3]
     return df2[df2["sentiment"] == sentiment_selected[:3]]["count"].to_list()
 
+
 def topic_comparison(competitors_df, competitor, color, topics, sentiment_selected):
     topics = topics[:10]  # momentaneo!!!
-    topics.append(topics[0])
+    if len(topics) > 0:
+        topics.append(topics[0])
 
-    values = get_topics_score_by_brand(competitor, competitors_df, sentiment_selected)[:10] # momentaneo!!!
-    values.append(values[0])
+    values = get_topics_score_by_brand(competitor, competitors_df, sentiment_selected)[:10]  # momentaneo!!!
+    if len(values) > 0:
+        values.append(values[0])
 
     fig = go.Figure(
         data=go.Scatterpolar(
-        r=values,
-        theta=topics,
-        fill="toself",
-        fillcolor=color,
-        line_color=color,
-        mode=None,
-        name=competitor,
-    ))
+            r=values,
+            theta=topics,
+            fill="toself",
+            fillcolor=color,
+            line_color=color,
+            mode=None,
+            name=competitor,
+        )
+    )
 
     fig.update_layout(default_layout)
     fig.update_layout(
-        polar = dict(radialaxis_range = [0, 100]),
-        margin=dict(l=40, r=40, t=40, b=40),
-        title={"text": competitor}
+        polar=dict(radialaxis_range=[0, 100]), margin=dict(l=40, r=40, t=40, b=40), title={"text": competitor}
     )
 
     return fig
-
-
