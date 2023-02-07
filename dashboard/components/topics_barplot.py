@@ -6,7 +6,7 @@ import plotly.express as px
 from dashboard.utils import default_layout, secondary_color
 
 
-def topics_barplot(brand_df):
+def topics_barplot(brand_df, perc=True):
     count = Counter()
     for x in brand_df["topics"].values:
         topics = set([y["name"] for y in x])
@@ -23,13 +23,15 @@ def topics_barplot(brand_df):
     fig = px.bar(
         topics_count,
         y="topic",
-        x="percentage",
+        x="percentage" if perc else "count",
         color_discrete_sequence=[secondary_color],
         category_orders=dict(topic=order),
         title="Topics",
     )
 
     fig.update_layout(default_layout)
-    fig.update_xaxes(ticksuffix="%")
+
+    if perc:
+        fig.update_xaxes(ticksuffix="%")
 
     return fig, order
