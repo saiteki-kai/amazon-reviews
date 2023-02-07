@@ -18,7 +18,7 @@ panel = html.Div(
         ),
         dbc.Row(
             dbc.Col(
-                dcc.Graph(figure=sentiment_piechart(data_df)),
+                dcc.Graph(figure=sentiment_piechart(data_df), config={"displayModeBar": False}),
                 className="h-100",
             ),
             id="row7",
