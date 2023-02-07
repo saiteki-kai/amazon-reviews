@@ -1,5 +1,16 @@
-def update_brand(data_df, brand, category, year):
-    df = data_df[(data_df["brand"] == brand) & (data_df["timestamp"].dt.year == int(year))].copy()
+import pandas as pd
+
+
+def update_brand(data_df, brand, category, from_year, to_year):
+    if int(from_year) >= int(to_year):
+        to = int(from_year)
+    else:
+        to = int(to_year)
+
+    to = pd.Timestamp(year=to, month=12, day=31)
+
+    year_mask = (data_df["timestamp"] >= from_year) & (data_df["timestamp"] <= to)
+    df = data_df[(data_df["brand"] == brand) & year_mask].copy()
 
     if category and category != "All":
         df = df[df["category"] == category].copy()
