@@ -1,8 +1,6 @@
-import dash
 import dash_bootstrap_components as dbc
-from dash import Input, Output, html
+from dash import html
 
-from dashboard.app import data_df
 from dashboard.pages.home.panels import (
     categories,
     reviews_over_time,
@@ -10,27 +8,6 @@ from dashboard.pages.home.panels import (
     topics,
     word_cloud,
 )
-
-
-@dash.callback(
-    Output("category-select", "options"),
-    Output("category-select", "value"),
-    Input("brand-select", "value"),
-    Input("url", "pathname"),
-)
-def update_categories(brand, pathname):
-    df = data_df[data_df["brand"] == brand]
-
-    categories = list(df["category"].value_counts().index)
-    options = [{"label": c, "value": c} for c in categories]
-
-    if pathname == "/comparison":
-        return options, options[0]["value"]
-
-    options = [{"label": "All", "value": "All"}] + options
-
-    return options, "All"
-
 
 layout = html.Div(
     [

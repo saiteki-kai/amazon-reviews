@@ -10,9 +10,11 @@ from dashboard.utils import update_brand
     Output("reviews-sentiment", "children"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
-    Input("year-select", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
 )
-def update_reviews_sentiment(brand, category, year):
+def update_reviews_sentiment(brand, category, from_year, to_year):
     # update graph brand
-    brand_df = update_brand(data_df, brand, category, year)
+    brand_df = update_brand(data_df, brand, category, from_year, to_year)
+
     return reviews_rating(brand_df)

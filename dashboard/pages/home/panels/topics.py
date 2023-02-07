@@ -10,11 +10,12 @@ from dashboard.utils import update_brand
     Output("topics-distribution", "figure"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
-    Input("year-select", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
 )
-def update_topics(brand, category, year):
+def update_topics(brand, category, from_year, to_year):
     # update graph brand
-    brand_df = update_brand(data_df, brand, category, year)
+    brand_df = update_brand(data_df, brand, category, from_year, to_year)
     fig1, order = topics_barplot(brand_df)
     return fig1
 

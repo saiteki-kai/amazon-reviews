@@ -13,11 +13,12 @@ from dashboard.utils import default_layout, update_brand
     Input("period", "value"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
-    Input("year-select", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
 )
-def plot_sentiment_over_time(period, brand, category, year):
+def plot_sentiment_over_time(period, brand, category, from_year, to_year):
     # update graph brand
-    brand_df = update_brand(data_df, brand, category, year)
+    brand_df = update_brand(data_df, brand, category, from_year, to_year)
 
     brand_df["period"] = brand_df["timestamp"].dt.to_period(period)
     brand_df["period"] = brand_df["period"].dt.to_timestamp()
@@ -42,7 +43,7 @@ def plot_sentiment_over_time(period, brand, category, year):
 
     fig.update_layout(default_layout)
     fig.update_layout(legend_orientation="v", margin=dict(t=40))
-    fig.update_xaxes(dtick="M1", tickformat="%b")
+    # fig.update_xaxes(dtick="M1", tickformat="%b")
     fig.update_yaxes(title_text="% Reviews", ticksuffix="%")
 
     return fig
@@ -58,6 +59,7 @@ panel = html.Div(
                 {"label": "Day", "value": "D"},
                 {"label": "Week", "value": "W"},
                 {"label": "Month", "value": "M"},
+                {"label": "Year", "value": "Y"},
             ],
             value="M",
             size="sm",
