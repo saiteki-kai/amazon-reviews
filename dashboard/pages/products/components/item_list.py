@@ -19,7 +19,7 @@ def row_item(row):
                         html.Img(src=row.imageURLHighRes),
                         className="item-img",
                     ),
-                    width=2,
+                    width=3,
                     className="h-100",
                 ),
                 dbc.Col(
@@ -42,10 +42,11 @@ def row_item(row):
     Input("pagination", "active_page"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
-    Input("year-select", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
 )
-def update_table(page, brand, category, year):
-    brand_df = update_brand(data_df, brand, category, year)
+def update_table(page, brand, category, from_year, to_year):
+    brand_df = update_brand(data_df, brand, category, from_year, to_year)
     brand_df = brand_df.drop_duplicates(["asin"])
 
     if not page:
@@ -87,6 +88,7 @@ item_list = html.Div(
                     max_value=0,
                     fully_expanded=False,
                     previous_next=True,
+                    size="sm",
                 ),
             ],
         ),

@@ -1,3 +1,5 @@
+import dash
+import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import html
 
@@ -29,12 +31,26 @@ def get_details(asin):
 
         return [
             html.H5(prod["title"], id="prod-title"),
-            html.Div(
-                html.Img(src=prod["imageURLHighRes"], alt="No Image Available"),
-                id="prod-img",
+            dbc.Row(
+                [
+                    dbc.Col(
+                        html.Div(
+                            html.Img(src=prod["imageURLHighRes"], alt="No Image Available"),
+                            id="prod-img",
+                        ),
+                        className="h-100",
+                    ),
+                    dbc.Col(
+                        [
+                            stars_icon(prod["overall"]),
+                            html.P(prod["description"], id="prod-desc"),
+                        ],
+                        className="h-100",
+                        id="description",
+                    ),
+                ],
+                className="g-0 scroll",
             ),
-            stars_icon(prod["overall"]),
-            html.P(prod["description"], id="prod-desc"),
         ]
 
-    return html.P(f"No results for {asin}.")
+    return dash.no_update
