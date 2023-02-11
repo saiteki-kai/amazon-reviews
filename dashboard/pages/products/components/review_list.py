@@ -40,7 +40,7 @@ def row_item(row):
                     [
                         dbc.Badge(
                             t["name"],
-                            color="red" if t["sentiment"] == 0 else "green",
+                            color="red" if t["sentiment"] == 1 else "green",
                             pill=True,
                             className="me-1",
                         )
