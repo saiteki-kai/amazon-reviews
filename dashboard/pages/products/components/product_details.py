@@ -16,6 +16,16 @@ def stars_icon(rating):
     return html.Div(([filled_star] * rating) + half + ([empty_star] * (5 - rating - len(half))))
 
 
+def global_sentiment(sentiment):
+    return dbc.Progress(
+        [
+            dbc.Progress(value=sentiment["positive"] * 100, color="green", bar=True),
+            dbc.Progress(value=sentiment["negative"] * 100, color="red", bar=True),
+        ],
+        id="global-product-sentiment",
+    )
+
+
 def get_details(asin):
     prods_df = data_df.drop_duplicates(["asin"])
     prods_df = prods_df.set_index("asin")[["title", "description", "category", "imageURLHighRes"]]
@@ -27,6 +37,13 @@ def get_details(asin):
 
     if prod_exists:
         prod = prods_df.loc[asin]
+
+        sent_counts_df = data_df[data_df["asin"] == asin]["sentiment"].value_counts(normalize=True).reset_index()
+        sent_counts_df = sent_counts_df.set_index("index")
+        sent_counts = {
+            "positive": sent_counts_df.loc["positive"]["sentiment"] if "positive" in sent_counts_df.index else 0,
+            "negative": sent_counts_df.loc["negative"]["sentiment"] if "negative" in sent_counts_df.index else 0,
+        }
 
         return [
             html.H5(prod["title"], id="prod-title"),
@@ -41,7 +58,9 @@ def get_details(asin):
                     ),
                     dbc.Col(
                         [
-                            stars_icon(prod["overall"]),
+                            html.Div(
+                                [stars_icon(prod["overall"]), global_sentiment(sent_counts)], id="global-product-stats"
+                            ),
                             html.P(prod["description"], id="prod-desc"),
                         ],
                         className="h-100",

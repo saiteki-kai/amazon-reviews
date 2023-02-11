@@ -268,6 +268,16 @@ i.fa-regular {
     align-items: center;
 }
 
+#global-product-sentiment {
+    width: 50%;
+}
+
+#global-product-stats {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 /* comparison Page -------------------------------------------------------------------------------------------------- */
 
 #row-c1 {
