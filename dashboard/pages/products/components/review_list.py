@@ -1,4 +1,4 @@
-from math import floor
+from math import ceil
 
 import dash
 import dash_bootstrap_components as dbc
@@ -81,7 +81,7 @@ def update_table(page, brand, category, from_year, to_year, asin):
     start = page_idx * PAGE_SIZE
     end = (page_idx + 1) * PAGE_SIZE
 
-    total = floor(len(reviews_df) / PAGE_SIZE)
+    total = ceil(len(reviews_df) / PAGE_SIZE)
 
     return (
         reviews_df.iloc[start:end].apply(row_item, axis=1),
