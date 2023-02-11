@@ -8,10 +8,12 @@ from dashboard.app import data_df
 from dashboard.pages.products.components.product_details import stars_icon
 from dashboard.utils import update_brand
 
-PAGE_SIZE = 4
+PAGE_SIZE = 5
 
 
 def row_item(row):
+    senti_topics = set([(t["sentiment"], t["name"]) for t in row.topics])
+
     return dbc.ListGroupItem(
         dbc.Col(
             [
@@ -39,12 +41,12 @@ def row_item(row):
                 html.Div(
                     [
                         dbc.Badge(
-                            t["name"],
-                            color="red" if t["sentiment"] == 1 else "green",
+                            st[1],
+                            color="red" if st[0] == 1 else "green",
                             pill=True,
                             className="me-1",
                         )
-                        for t in row.topics
+                        for st in senti_topics
                     ]
                 ),
             ],
