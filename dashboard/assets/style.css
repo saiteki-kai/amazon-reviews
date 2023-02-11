@@ -108,6 +108,11 @@
     background-position: right 0.5rem center;
 }
 
+.form-check-label {
+    margin-bottom: 0;
+    font-size: 12px;
+}
+
 /* products Page ---------------------------------------------------------------------------------------------------- */
 
 #row1,
@@ -266,7 +271,7 @@ i.fa-regular {
 /* comparison Page -------------------------------------------------------------------------------------------------- */
 
 #row-c1 {
-    height: 15%;
+    height: 20%;
 }
 
 #row-c2 {
@@ -274,7 +279,7 @@ i.fa-regular {
 }
 
 #row-c3 {
-    height: 45%;
+    height: 40%;
     /*height: calc((100% - 5%) / 2)*/
 }
 

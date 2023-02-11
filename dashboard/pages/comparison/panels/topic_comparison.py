@@ -70,16 +70,32 @@ def topic_comparison(competitors_df, competitor, color, topics, sentiment_select
         data=go.Scatterpolar(
             r=values,
             theta=topics,
-            fill="toself",
+            fill="tonext",
             connectgaps=True,
-            fillcolor=color,
+            # fillcolor=color,
             line_color=color,
+            opacity=1,
             mode=None,
             name=competitor,
         )
     )
 
     # fig.update_layout(default_layout)
-    fig.update_layout(polar=dict(radialaxis_range=[0, 100]), margin=dict(t=60, b=60), title={"text": competitor})
+    fig.update_layout(
+        polar=dict(
+            gridshape="linear",
+            bgcolor="#fefefe",
+            angularaxis_linecolor="#111",
+            radialaxis_gridcolor="#ccc",
+            angularaxis_gridcolor="#ccc",
+            angularaxis_layer="below traces",
+            radialaxis_range=[0, 100],
+            radialaxis_ticksuffix="%",
+            radialaxis_tickfont_size=10,
+            radialaxis_tickvals=[0, 50, 100],
+        ),
+        margin=dict(t=30, b=30),
+        title={"text": competitor},
+    )
 
     return fig
