@@ -4,14 +4,16 @@ import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
-from dash import Input, Output, dcc, html
+from dash import ALL, MATCH, Input, Output, dcc, html
 
 from dashboard.app import data_df
-from dashboard.pages.comparison.panels.topic_comparison import (
-    sentiment_aspect_df,
-    topic_comparison,
+from dashboard.pages.comparison.panels.topic_comparison import topic_comparison
+from dashboard.utils import (
+    default_layout,
+    primary_color,
+    secondary_color,
+    update_options,
 )
-from dashboard.utils import default_layout, primary_color, secondary_color
 
 
 def global_sentiment_barplot(sentiment_df_perc, competitors, colors):
@@ -57,8 +59,9 @@ def positive_sentiment_overtime_plot(brand, competitors, competitors_df, period,
         title="Sentiment Over Time By Brand",
     )
     fig3.update_layout(default_layout)
-    fig3.update_xaxes(showgrid=False, title_text="")
-    fig3.update_yaxes(showgrid=False, title_text="# Reviews")  # , ticksuffix="%")
+    fig3.update_xaxes(title_text="")
+    fig3.update_yaxes(title_text="# Reviews")  # , ticksuffix="%")
+
     return fig3
 
 
@@ -123,11 +126,15 @@ def sentiment_topic_plot(brand, competitors, competitors_df):
     Input("brand-select", "value"),
     Input("category-select", "value"),
     Input("sentiment-switch", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
+    Input("comparison-period", "value"),
+    Input({"type": "checklist", "index": ALL}, "value"),
 )
-def update_plot(brand, category, sentiment):
-    # costant parameters
-    period = "Y"
+def update_plot(brand, category, sentiment, from_year, to_year, period, checklists):
+    # constant parameters
     n_brand_to_keep = 3
+    selected_topics = [i for c in checklists for i in c]
 
     # update dataframe based on category
     category_df = data_df[data_df["category"] == category]
@@ -141,7 +148,12 @@ def update_plot(brand, category, sentiment):
     # competitors selection by # of reviews and add brand
     competitors = list(competitors_df["brand"].value_counts().index)[:n_brand_to_keep]
     competitors = [brand] + competitors
+
     competitors_df = category_df[category_df["brand"].isin(competitors)]
+
+    to_year = pd.Timestamp(year=int(to_year), month=12, day=31)
+    year_mask = (competitors_df["timestamp"] >= from_year) & (competitors_df["timestamp"] <= to_year)
+    competitors_df = competitors_df[year_mask]
 
     # compute sentiment perc for the competitors
     sentiment_df = competitors_df.groupby("brand")["sentiment"].value_counts()
@@ -159,16 +171,25 @@ def update_plot(brand, category, sentiment):
     brand_index = competitors.index(brand)
     plotly_colors[brand_index] = primary_color
 
-    # comperison plots
+    # comparison plots
     fig1 = global_sentiment_barplot(sentiment_df_perc, competitors, plotly_colors)
     fig2 = positive_sentiment_overtime_plot(
         brand, competitors, competitors_df, period, plotly_colors, sentiment_selected
     )
 
-    topics = list(set(sentiment_aspect_df(competitors_df)["topic"].unique()))
     figures = []
     for i, competitor in enumerate(competitors):
-        figures.append(topic_comparison(competitors_df, competitor, plotly_colors[i], topics, sentiment_selected))
+        figures.append(
+            topic_comparison(
+                competitors_df,
+                competitor,
+                plotly_colors[i],
+                selected_topics.copy(),
+                sentiment_selected,
+            )
+        )
+
+    figures.extend([{}] * (4 - len(competitors)))
 
     return fig1, fig2, *figures
 
@@ -186,17 +207,105 @@ def on_sentiment_switch_change(sentiment_checked):
         return "Negative Sentiment"
 
 
+@dash.callback(
+    Output("comparison-period", "options"),
+    Output("comparison-period", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
+)
+def update_period_select(from_year, to_year):
+    return update_options(from_year, to_year)
+
+
+@dash.callback(
+    Output({"type": "radio", "index": ALL}, "value"),
+    Input({"type": "radio", "index": ALL}, "value"),
+)
+def disable_checklists(value):
+    props = dash.callback_context.triggered_prop_ids
+    inputs = list(dash.callback_context.inputs)
+
+    if len(props) > 0 and len(inputs) > 0:
+        key = list(props.keys())[0]
+
+        idx = inputs.index(key)
+
+        value = [False, False, False]
+        value[idx] = True
+
+        return value
+
+    return value
+
+
+@dash.callback(
+    Output({"type": "checklist", "index": MATCH}, "value"),
+    Input({"type": "radio", "index": MATCH}, "value"),
+    Input({"type": "checklist", "index": MATCH}, "options"),
+)
+def update_checklists(selected, options):
+    if selected:
+        return [o["label"] for o in options]
+
+    return []
+
+
+def topic_group(name, topics, active=False):
+    suffix = name.replace(" ", "-").lower()
+
+    return html.Div(
+        [
+            dbc.RadioButton(id={"type": "radio", "index": suffix}, label=name, value=active),
+            dbc.Checklist(
+                options=[{"label": t, "value": t} for t in topics],
+                value=[],
+                id={"type": "checklist", "index": suffix},
+                inline=True,
+            ),
+        ],
+        className="topic-group",
+    )
+
+
+topics_checklist = html.Div(
+    [
+        topic_group(
+            "Set 1",
+            {"satisfaction", "price", "quality", "performance", "delivery"},
+            active=True,
+        ),
+        topic_group(
+            "Set 2",
+            {"motherboard", "CPU", "PSU", "memory", "cooling system"},
+        ),
+        topic_group(
+            "Set 3",
+            {"installation", "aesthetic", "sound", "video", "temperature", "thermal paste", "overclocking"},
+        ),
+    ],
+    className="topic-checklists",
+)
+
 layout = html.Div(
     [
         dbc.Row(
-            dbc.Col(
-                dbc.Switch(
-                    id="sentiment-switch",
-                    label="Positive Sentiment",
-                    value=True,
+            [
+                dbc.Col(
+                    html.Div(
+                        [
+                            dbc.Switch(
+                                id="sentiment-switch",
+                                label="Positive Sentiment",
+                                value=True,
+                                className="pe-4",
+                            ),
+                            topics_checklist,
+                        ],
+                        className="panel comparison-inputs",
+                    ),
+                    className="h-100",
                 ),
-                className="h-100",
-            ),
+            ],
             id="row-c1",
             className="g-0",
         ),
@@ -211,8 +320,23 @@ layout = html.Div(
                 ),
                 dbc.Col(
                     html.Div(
-                        dcc.Graph(id="time_brand_pos_sentiment", config={"displayModeBar": False}),
+                        [
+                            dcc.Graph(id="time_brand_pos_sentiment", config={"displayModeBar": False}),
+                            dbc.Select(
+                                id="comparison-period",
+                                className="floating-select",
+                                options=[
+                                    {"label": "Day", "value": "D"},
+                                    {"label": "Week", "value": "W"},
+                                    {"label": "Month", "value": "M"},
+                                    {"label": "Year", "value": "Y"},
+                                ],
+                                value="M",
+                                size="sm",
+                            ),
+                        ],
                         className="panel",
+                        style={"position": "relative"},
                     ),
                     className="h-100",
                 ),

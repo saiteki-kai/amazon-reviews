@@ -19,28 +19,32 @@ app = Dash(
 data_df = pd.read_json(asum_output_dir / "reviews_sentiments.json.gz")
 data_df = data_df[data_df["brand"].isin(list(data_df["brand"].value_counts()[:40].index))]
 
+categories = data_df.groupby(["brand"])["category"].value_counts().rename("count").reset_index()
+brand_cats = categories[categories["count"] > 30][["brand", "category"]]
+
+data_df = data_df.merge(brand_cats, on=["brand", "category"])
+
+data_df["brand"] = data_df["brand"].astype("string").astype("category").astype("string")
+data_df["category"] = data_df["category"].astype("string").astype("category").astype("string")
+
 topic_set = {
-    "?",
+    "CPU",
+    "PSU",
     "aesthetic",
-    "buy",
     "cooling system",
     "delivery",
+    "video",
     "installation",
     "memory",
     "motherboard",
-    "optical disc",
     "overclocking",
-    "pc",
     "performance",
     "price",
-    "processor",
-    "psu",
     "quality",
-    "satisfaction/recommanded",
+    "satisfaction",
     "sound",
-    "storage connectivity",
     "temperature",
-    "time",
-    "upgrade",
-    "video",
+    "thermal paste",
 }
+
+data_df["topics"] = data_df["topics"].apply(lambda x: [y for y in x if y["name"] in topic_set])
