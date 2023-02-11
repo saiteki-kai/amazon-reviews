@@ -53,7 +53,7 @@ layout = html.Div(
                                 className="h-100",
                             ),
                             dbc.Col(
-                                html.Div(className="panel"),
+                                # html.Div(className="panel"),
                                 width=4,
                                 className="h-100",
                             ),
