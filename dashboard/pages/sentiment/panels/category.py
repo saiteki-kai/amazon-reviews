@@ -16,9 +16,8 @@ from dashboard.utils import update_brand
 def update_brand_categories(brand, category, from_year, to_year):
     # update graph brand
     brand_df = update_brand(data_df, brand, category, from_year, to_year)
-    order = dict(category=list(brand_df["category"].value_counts().index))
 
-    return category_sentiment_barplot(brand_df, order)
+    return category_sentiment_barplot(brand_df)
 
 
 panel = html.Div(
