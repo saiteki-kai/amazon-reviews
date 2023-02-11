@@ -1,4 +1,3 @@
-import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import html
@@ -53,4 +52,4 @@ def get_details(asin):
             ),
         ]
 
-    return dash.no_update
+    return []

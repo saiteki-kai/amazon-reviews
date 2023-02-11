@@ -36,8 +36,9 @@ def set_active(product_clicks, product_ids):
     Output("current-asin", "data"),
     Output("review-pagination", "active_page"),
     Input({"type": "item", "asin": ALL}, "n_clicks"),
+    Input("category-select", "value"),
 )
-def update_asin(product_ids):
+def update_asin(product_ids, _):
     selected_asin = None
     if not all([prod is None for prod in product_ids]):
         if "asin" in dash.callback_context.triggered_id:
@@ -63,12 +64,14 @@ def update_page(brand, category, from_year, to_year, asin):
     if asin:
         brand_df = brand_df[brand_df["asin"] == asin]
 
-    fig1, order = topics_barplot(brand_df, perc=False)
-    fig2 = topics_sentiment_barplot(brand_df, order)
+        fig1, order = topics_barplot(brand_df, perc=False)
+        fig2 = topics_sentiment_barplot(brand_df, order)
 
-    details = get_details(asin)
+        details = get_details(asin)
 
-    return fig1, fig2, details
+        return fig1, fig2, details
+
+    return {}, {}, None
 
 
 layout = html.Div(

@@ -56,7 +56,6 @@ def row_item(row):
 @dash.callback(
     Output("review-items", "children"),
     Output("review-pagination", "max_value"),
-    # Output("total", "children"),
     Input("review-pagination", "active_page"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
@@ -68,7 +67,7 @@ def update_table(page, brand, category, from_year, to_year, asin):
     brand_df = update_brand(data_df, brand, category, from_year, to_year)
 
     if asin is None:
-        return dash.no_update
+        return None, 0
 
     reviews_df = brand_df[brand_df["asin"] == asin]
 
