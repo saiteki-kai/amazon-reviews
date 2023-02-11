@@ -5,7 +5,22 @@ from dash import Input, Output, dcc, html
 from plotly import express as px
 
 from dashboard.app import data_df
-from dashboard.utils import default_layout, secondary_color, update_brand
+from dashboard.utils import (
+    default_layout,
+    secondary_color,
+    update_brand,
+    update_options,
+)
+
+
+@dash.callback(
+    Output("home-period", "options"),
+    Output("home-period", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
+)
+def update_period_select(from_year, to_year):
+    return update_options(from_year, to_year)
 
 
 @dash.callback(

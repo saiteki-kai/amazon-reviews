@@ -5,12 +5,22 @@ from dash import Input, Output, dcc, html
 from plotly import express as px
 
 from dashboard.app import data_df
-from dashboard.utils import default_layout, update_brand
+from dashboard.utils import default_layout, update_brand, update_options
+
+
+@dash.callback(
+    Output("sentiment-period", "options"),
+    Output("sentiment-period", "value"),
+    Input("from-year-select", "value"),
+    Input("to-year-select", "value"),
+)
+def update_period_select(from_year, to_year):
+    return update_options(from_year, to_year)
 
 
 @dash.callback(
     Output("sentiment-over-time", "figure"),
-    Input("period", "value"),
+    Input("sentiment-period", "value"),
     Input("brand-select", "value"),
     Input("category-select", "value"),
     Input("from-year-select", "value"),
@@ -53,7 +63,7 @@ panel = html.Div(
     [
         dcc.Graph(id="sentiment-over-time", config={"displayModeBar": False}),
         dbc.Select(
-            id="period",
+            id="sentiment-period",
             className="floating-select pe-0",
             options=[
                 {"label": "Day", "value": "D"},

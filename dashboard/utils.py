@@ -18,6 +18,19 @@ def update_brand(data_df, brand, category, from_year, to_year):
     return df
 
 
+def update_options(from_year, to_year):
+    options = [
+        {"label": "Day", "value": "D"},
+        {"label": "Week", "value": "W"},
+        {"label": "Month", "value": "M"},
+    ]
+
+    if from_year != to_year:
+        options.extend([{"label": "Year", "value": "Y"}])
+
+    return options, options[-1]["value"]
+
+
 primary_color = "#ECE81A"
 secondary_color = "#C3C5C5"
 
