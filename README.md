@@ -48,3 +48,46 @@ Install the "reviews" package
 ```bash
 pip install -e .
 ```
+
+Download the dataset consisting of reviews and metadata from the Electronics category in the `./data/raw/` folder.
+
+Run the following scripts to filter the products metadata by the category "Computer Internal Components" and 
+then obtain the corresponding subset of reviews
+
+```bash
+python scripts/filter-metadata.py
+python scripts/filter-reviews.py 
+```
+
+Download the project in the root folder and generate the executable for JST
+
+```bash
+cd JST/Debug
+make
+mv jst ../../bin/
+```
+
+Download the project in the root folder and generate the executable for ASUM
+
+```bash
+cd ASUM/ASUM
+jar cf ASUM.jar 
+mv ASUM.jar ../../bin/
+```
+
+Execute the notebooks to perform the processing and the analysis.
+
+```
+./notebooks
+    01_clean.ipynb       # Data cleaning
+    02_analysis.ipynb    # Exploratory data analysis
+    03_processing.ipynb  # Text processing
+    04_jst.ipynb         # JST traning and performance
+    05_asum.ipynb        # ASUM traning and performance
+    06_results.ipynb     # Results and comparison of the models
+```
+
+Launch the dashboard
+```bash
+python dashboard/run.py
+```
