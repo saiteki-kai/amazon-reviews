@@ -14,3 +14,8 @@ asum_model_path = bin_dir / "ASUM.jar"
 
 asum_input_dir = data_dir / "asum"
 asum_output_dir = out_dir / "asum"
+
+# create folders
+for folder in [out_dir, raw_data_dir, processed_data_dir, asum_input_dir, asum_output_dir]:
+    if not folder.exists():
+        folder.mkdir()
