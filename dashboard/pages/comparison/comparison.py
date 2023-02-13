@@ -271,16 +271,16 @@ topics_checklist = html.Div(
     [
         topic_group(
             "Set 1",
-            {"satisfaction", "price", "quality", "performance", "delivery"},
+            {"Satisfaction", "Price", "Quality", "Performance", "Delivery"},
             active=True,
         ),
         topic_group(
             "Set 2",
-            {"motherboard", "CPU", "PSU", "memory", "cooling system"},
+            {"Motherboard", "Processor", "Power Supply", "Memory", "Cooling System"},
         ),
         topic_group(
             "Set 3",
-            {"installation", "aesthetic", "sound", "video", "temperature", "thermal paste", "overclocking"},
+            {"Installation", "Aesthetic", "Sound", "Video", "Temperature", "Thermal Paste", "Overclocking"},
         ),
     ],
     className="topic-checklists",
