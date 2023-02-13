@@ -36,6 +36,8 @@ filelock==3.8.0
 flake8==5.0.4
 Flask==2.2.2
 fonttools==4.38.0
+huggingface-hub==0.12.0
+humanize==4.4.0
 idna==3.4
 iniconfig==1.1.1
 ipykernel==6.17.1
@@ -57,6 +59,7 @@ jupyter_client==7.4.7
 jupyter_core==5.0.0
 jupyterlab-pygments==0.2.2
 jupyterlab-widgets==3.0.3
+kaleido==0.2.1
 kiwisolver==1.4.4
 MarkupSafe==2.1.1
 matplotlib==3.6.2
@@ -91,7 +94,7 @@ psutil==5.9.4
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pyahocorasick==1.4.4
-pybind11==2.10.1
+pybind11==2.10.3
 pycodestyle==2.9.1
 pycparser==2.21
 pyflakes==2.5.0
@@ -108,6 +111,8 @@ QtPy==2.3.0
 regex==2022.10.31
 requests==2.28.1
 s3transfer==0.6.0
+scikit-learn==1.2.1
+scipy==1.10.0
 seaborn==0.12.1
 Send2Trash==1.8.0
 sentencepiece==0.1.97
@@ -118,6 +123,7 @@ stack-data==0.6.1
 tenacity==8.1.0
 terminado==0.17.0
 textsearch==0.0.24
+threadpoolctl==3.1.0
 tinycss2==1.2.1
 tokenizers==0.13.2
 tomli==2.0.1
@@ -133,5 +139,3 @@ websocket-client==1.4.2
 Werkzeug==2.2.2
 widgetsnbextension==4.0.3
 wordcloud==1.8.2.2
-setuptools~=65.5.0
-humanize~=4.4.0
