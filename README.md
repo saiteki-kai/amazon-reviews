@@ -51,7 +51,7 @@ pip install -e .
 
 Download the dataset consisting of reviews and metadata from the Electronics category in the `./data/raw/` folder.
 
-Run the following scripts to filter the products metadata by the category "Computer Internal Components" and 
+Run the following scripts to filter the products metadata by the category "Computer Internal Components" and
 then obtain the corresponding subset of reviews
 
 ```bash
@@ -62,6 +62,7 @@ python scripts/filter-reviews.py
 Download the project in the root folder and generate the executable for JST
 
 ```bash
+mkdir "bin"
 cd JST/Debug
 make
 mv jst ../../bin/
@@ -70,9 +71,10 @@ mv jst ../../bin/
 Download the project in the root folder and generate the executable for ASUM
 
 ```bash
-cd ASUM/ASUM
-jar cf ASUM.jar 
-mv ASUM.jar ../../bin/
+cd ASUM/ASUM/bin
+echo -en "Main-Class: sto2.STO2Core\n" > manifest.mf
+jar -cvf ASUM.jar manifest.mf bin/**/*.class
+mv ASUM.jar ../../../bin/
 ```
 
 Execute the notebooks to perform the processing and the analysis.
@@ -88,6 +90,7 @@ Execute the notebooks to perform the processing and the analysis.
 ```
 
 Launch the dashboard
+
 ```bash
 python dashboard/run.py
 ```
