@@ -73,7 +73,7 @@ Download the project in the root folder and generate the executable for ASUM
 ```bash
 cd ASUM/ASUM/bin
 echo -en "Main-Class: sto2.STO2Core\n" > manifest.mf
-jar -cvf ASUM.jar manifest.mf bin/**/*.class
+jar -cvf ASUM.jar manifest.mf **/*.class
 mv ASUM.jar ../../../bin/
 ```
 
