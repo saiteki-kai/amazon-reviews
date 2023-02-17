@@ -1,7 +1,7 @@
 import pandas as pd
 import plotly.express as px
 
-from dashboard.utils import default_layout
+from dashboard.config import default_layout
 
 
 def category_sentiment_barplot(brand_df):

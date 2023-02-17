@@ -3,7 +3,7 @@ from collections import Counter
 import pandas as pd
 import plotly.express as px
 
-from dashboard.utils import default_layout, secondary_color
+from dashboard.config import default_layout, secondary_color
 
 
 def topics_barplot(brand_df, perc=True):

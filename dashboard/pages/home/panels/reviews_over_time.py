@@ -5,12 +5,8 @@ from dash import Input, Output, dcc, html
 from plotly import express as px
 
 from dashboard.app import data_df
-from dashboard.utils import (
-    default_layout,
-    secondary_color,
-    update_brand,
-    update_options,
-)
+from dashboard.config import default_layout, secondary_color
+from dashboard.utils import update_brand, update_options
 
 
 @dash.callback(

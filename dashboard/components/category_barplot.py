@@ -1,7 +1,7 @@
 import pandas as pd
 import plotly.express as px
 
-from dashboard.utils import default_layout, secondary_color
+from dashboard.config import default_layout, secondary_color
 
 
 def category_barplot(brand_df, order):

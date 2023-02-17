@@ -4,7 +4,8 @@ import plotly.express as px
 from dash import Input, Output, dcc, html
 
 from dashboard.app import data_df
-from dashboard.utils import default_layout, update_brand
+from dashboard.config import default_layout
+from dashboard.utils import update_brand
 
 
 @dash.callback(

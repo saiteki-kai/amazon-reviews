@@ -7,13 +7,9 @@ import plotly.express as px
 from dash import ALL, MATCH, Input, Output, dcc, html
 
 from dashboard.app import data_df
+from dashboard.config import default_layout, primary_color, secondary_color
 from dashboard.pages.comparison.panels.topic_comparison import topic_comparison
-from dashboard.utils import (
-    default_layout,
-    primary_color,
-    secondary_color,
-    update_options,
-)
+from dashboard.utils import update_options
 
 
 def global_sentiment_barplot(sentiment_df_perc, competitors, colors):

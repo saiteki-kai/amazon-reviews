@@ -31,22 +31,38 @@ def update_options(from_year, to_year):
     return options, options[-1]["value"]
 
 
-primary_color = "#ECE81A"
-secondary_color = "#C3C5C5"
+def load_dataset(path):
+    data_df = pd.read_json(path)
+    data_df = data_df[data_df["brand"].isin(list(data_df["brand"].value_counts()[:40].index))].copy()
 
-default_layout = {
-    "margin": dict(l=0, t=30, r=0, b=0),
-    "title_pad": dict(t=0, b=0),
-    "legend_orientation": "h",
-    # "legend_yanchor": "bottom",
-    # "legend_y": 1.02,
-    # "legend_x": 1,
-    # "legend_xanchor": "right",
-    # "legend_title": "",
-    # "hovermode": False,
-    "dragmode": False,
-    "plot_bgcolor": "#fff",
-    "modebar_orientation": "v",
-    "xaxis": dict(showgrid=False, title_text=""),
-    "yaxis": dict(showgrid=False, title_text=""),
-}
+    categories = data_df.groupby(["brand"])["category"].value_counts().rename("count").reset_index()
+    brand_cats = categories[categories["count"] > 30][["brand", "category"]]
+
+    data_df = data_df.merge(brand_cats, on=["brand", "category"])
+
+    data_df["brand"] = data_df["brand"].astype("string").astype("category").astype("string")
+    data_df["category"] = data_df["category"].astype("string").astype("category").astype("string")
+
+    topic_set = {
+        "Satisfaction",
+        "Price",
+        "Quality",
+        "Performance",
+        "Delivery",
+        "Motherboard",
+        "Processor",
+        "Power Supply",
+        "Memory",
+        "Cooling System",
+        "Installation",
+        "Aesthetic",
+        "Sound",
+        "Video",
+        "Temperature",
+        "Thermal Paste",
+        "Overclocking",
+    }
+
+    data_df["topics"] = data_df["topics"].apply(lambda x: [y for y in x if y["name"] in topic_set])
+
+    return data_df
