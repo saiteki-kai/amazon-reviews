@@ -1,0 +1,14 @@
+\section{Conclusioni}
+Dopo aver eseguito un pre-processing sul testo, un'analisi iniziale sui dati e diversi esperimenti è stato possibile eseguire delle analisi aspect-based dei dati. Questo ci ha permesso di trovare risposta alle domande poste per poter compiere al meglio la richiesta posta dal brand nostro cliente, ovvero Corsair.
+
+In sintesi quello che possiamo dire è che negli utenti si riscontra un alto gradimento verso il brand e i suoi prodotti, nei quali non è stato riscontrato nessun prodotto che danneggi l'immagine della Corsair.
+
+I principali aspetti associati al brand e il relativo gradimento da parte del pubblico permettono di identificare i punti di forza e cosa più importante permette di identificare gli aspetti critici che richiedono più attenzione da parte di Corsair.
+
+Grazie alle analisi è stato possibile identificare quali sono i principali competitor e analizzarne il \textit{sentiment} rispetto al nostro brand. Sia rispetto ad una valutazione generale, sia rispetto a una valutazione dettaglia sul singolo topic.
+
+In questo progetto due modelli ASUM e JST per l'aspect-based sentiment analysis sono stati addestrati e comparati con diverse prove effettuando il task di sentiment analysis. I risultati migliori sono stati ottenuti da ASUM considerando 50 topic ed effettuando lo \textit{stemming}, con un valore di F1 del 63.8\%.
+
+Un'ulteriore prova è stata effettuata per cercare di migliorare la fase di negazione dei token, suddividendo le frasi dove presenti delle congiunzioni avversative, ma che non ha portato alcun miglioramento.
+
+Sono molti i possibili miglioramenti tra cui diversi pre-processing, in particolare migliorare la suddivisione delle frasi permetterebbe una migliore negazione dei token aumentando le performance del riconoscimento del \textit{sentiment}, inoltre si potrebbe considerare il \textit{sentiment} neutrale, espandere i \textit{seed} di partenza ed effettuare una valutazione dei topic estratti con una \textit{groundtruth}.
