@@ -93,4 +93,8 @@ Launch the dashboard
 
 ```bash
 python dashboard/run.py
+
+# or 
+
+gunicorn dashboard.run:server
 ```
